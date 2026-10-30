@@ -34,9 +34,6 @@
   .ex-close:hover{color:var(--dark)}
   .ex-quote{font-size:clamp(16px,2.4vw,20px);line-height:1.85;color:var(--dark);font-family:'Gowun Dodum',sans-serif;word-break:keep-all;white-space:pre-line}
   .ex-src{margin-top:18px;font-size:14px;color:var(--muted)}
-  .ex-timer{margin-top:26px;font-size:46px;font-weight:800;letter-spacing:1px;color:var(--green);font-variant-numeric:tabular-nums;line-height:1}
-  .ex-timer.done{color:var(--red)}
-  .ex-timer-label{font-size:12px;color:var(--muted);margin-top:6px}
   .ex-next{margin-top:22px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 18px;font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer}
   .ex-next:hover{border-color:var(--yellow);background:#fffbea}
   .cm{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);text-align:left}
@@ -54,7 +51,7 @@
   .cm-send{flex:none;border:none;border-radius:9px;padding:8px 16px;background:var(--yellow);color:#3a2a00;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
   .cm-send:disabled{opacity:.5;cursor:default}
   .cm-st{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px}
-  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-timer{font-size:38px}}
+  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}}
   @media (prefers-reduced-motion:reduce){.ex-box{animation:none}.daisy-fp{display:none}}
 </style>
 </head>
@@ -205,7 +202,7 @@ function daisyClick(){
   requestAnimationFrame(frame);
 }
 
-/* ---------- 발췌 카드 (5분 타이머 = 그 문장을 곱씹는 시간) ---------- */
+/* ---------- 발췌 카드 ---------- */
 var exTimer=null;
 function showExcerpt(){
   var it=pickItem();if(!it)return;
@@ -218,8 +215,6 @@ function showExcerpt(){
     +'<button type="button" class="ex-close" onclick="closeExcerpt()" title="닫기 (Esc)" aria-label="닫기">✕</button>'
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
     +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
-    +'<div class="ex-timer" id="exTimer">05:00</div>'
-    +'<div class="ex-timer-label">이 문장과 함께하는 5분</div>'
     +'<section class="cm" aria-label="의견">'
     +'<div class="cm-h">이 문장에 대한 생각</div>'
     +'<div class="cm-list" id="cmList"><div class="cm-empty">불러오는 중…</div></div>'
@@ -232,13 +227,6 @@ function showExcerpt(){
   document.body.appendChild(ov);
   document.addEventListener('keydown',exEsc);
   cmLoad(it);
-  var left=300, tEl=document.getElementById('exTimer');
-  exTimer=setInterval(function(){
-    left--;
-    var m=Math.floor(left/60), sc=left%60;
-    if(tEl)tEl.textContent=(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc;
-    if(left<=0){clearInterval(exTimer);exTimer=null;if(tEl){tEl.textContent='00:00';tEl.classList.add('done');}}
-  },1000);
 }
 function exEsc(e){
   if(e.key!=='Escape')return;
@@ -256,7 +244,7 @@ function cmLoad(it){
       if(CUR!==it)return;
       box.innerHTML=rows.length?rows.map(function(c){return '<div class="cm-it"><div class="cm-m"><b>'+esc(c.name||'익명')+'</b><span>'+esc(fmtWhen(c.created_at))+'</span></div><div class="cm-b">'+esc(c.body)+'</div></div>';}).join('')
         :'<div class="cm-empty">아직 남긴 생각이 없습니다. 처음으로 남겨 보세요.</div>';
-    }).catch(function(){box.innerHTML='<div class="cm-empty">의견을 불러오지 못했습니다.</div>';});
+    }).catch(function(){if(CUR===it)box.innerHTML='';});
 }
 function cmPost(){
   var it=CUR;if(!it)return;
@@ -269,7 +257,7 @@ function cmPost(){
     body:JSON.stringify({excerpt_id:exKey(it),excerpt_snip:String(it.text).slice(0,120),name:name,body:body.slice(0,1000)})})
     .then(function(r){if(!r.ok)throw new Error(r.status);
       b.value='';stEl.textContent='남겼습니다 🌼';setTimeout(function(){if(stEl)stEl.textContent='';},2000);cmLoad(it);})
-    .catch(function(e){stEl.textContent='남기지 못했습니다 ('+e.message+') · 잠시 뒤 다시 해 주세요';})
+    .catch(function(e){stEl.textContent='남기지 못했습니다'+(e.message==='404'?' · 의견 저장소가 아직 준비되지 않았습니다':' · 잠시 뒤 다시 해 주세요');})
     .then(function(){btn.disabled=false;});
 }
 function closeExcerpt(){CUR=null;if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
