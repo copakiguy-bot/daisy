@@ -48,6 +48,8 @@
   .imp .t{font-family:'Gowun Dodum',sans-serif;font-size:14px;line-height:1.6;color:var(--dark)}
   .imp .s{font-size:12px;color:var(--muted);margin-top:2px}
   .imp .dup{opacity:.45}
+  .cm-ex{font-size:12px;color:var(--muted);margin-bottom:4px;font-family:'Gowun Dodum',sans-serif}
+  .it.cm-hid{opacity:.5}
   details summary{cursor:pointer;color:var(--muted);font-size:13px}
   .help{font-size:12.5px;color:var(--muted);line-height:1.75;margin-top:8px}
   .help code{background:var(--cream);padding:1px 5px;border-radius:4px}
@@ -92,6 +94,17 @@
     <div id="list"><div class="empty">불러오는 중…</div></div>
   </div>
 
+  <div class="card" id="cmCard">
+    <h2>의견 <span class="more" id="cmCnt"></span></h2>
+    <div class="row">
+      <input id="adm" class="in" type="password" style="flex:1;min-width:180px" placeholder="의견 관리 비밀번호 (Supabase 에 정한 것)" autocomplete="off">
+      <button class="btn ghost" onclick="cmCfg()">저장 · 불러오기</button>
+      <label style="font-size:12.5px;color:var(--muted);display:flex;gap:5px;align-items:center"><input type="checkbox" id="cmShowHidden" onchange="cmRender()"> 숨긴 것도 보기</label>
+    </div>
+    <div class="st" id="cmSt"></div>
+    <div id="cmList"></div>
+  </div>
+
   <div class="card">
     <h2>HMD에서 가져오기</h2>
     <div class="help" style="margin-top:0">HMD <b>설정 → 전체 데이터 백업 → 전체 데이터 받기</b>로 받은 파일(HMD_전체백업_….json)을 고르면, 독서 발췌가 목록으로 나옵니다. 고른 것만 추가됩니다.</div>
@@ -101,7 +114,9 @@
 </div>
 
 <script>
-var DATA={title:'데이지',items:[]}, SHA=null, DIRTY=false, EDIT=null, IMP=[];
+var DATA={title:'데이지',items:[]}, SHA=null, DIRTY=false, EDIT=null, IMP=[], CMS=[];
+var SUPA_URL='https://qjedpvzqpheggfyupkof.supabase.co', SUPA_KEY='sb_publishable_XzarJNgIdymB3HShYoPvnA_qe_ige_l';
+function sbH(extra){return Object.assign({apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'},extra||{});}
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||'';if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return '';}}
@@ -159,7 +174,8 @@ function render(){
       +'<input id="eAuthor" class="in" list="authorList" style="flex:1" value="'+esc(x.author||'')+'" placeholder="저자">'
       +'<input id="ePage" class="in" style="width:80px" value="'+esc(x.page||'')+'" placeholder="쪽">'
       +'<button class="btn" onclick="editSave('+x.id+')">확인</button><button class="btn ghost" onclick="EDIT=null;render()">취소</button></div></div></div>';
-    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x))+'</div></div>'
+    var nc=CMS.filter(function(c){return c.excerpt_id===String(x.id)&&!c.hidden;}).length;
+    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x))+(nc?' · <a href="#cmCard" style="color:var(--green)">의견 '+nc+'</a>':'')+'</div></div>'
       +'<div class="act"><button onclick="EDIT='+x.id+';render()">고치기</button><button class="del" onclick="delItem('+x.id+')">지우기</button></div></div>';
   }).join('');
   paintBar();
@@ -197,6 +213,42 @@ function publish(){
 }
 window.addEventListener('beforeunload',function(e){if(DIRTY){e.preventDefault();e.returnValue='';}});
 
+/* ---- 의견: 데이지 화면에서 남긴 생각 (비밀번호로 전체 보기 · 숨기기/되살리기) ---- */
+function adm(){return ($('adm').value||'').trim();}
+function cmCfg(){ls('dz_adm',adm()||null);cmLoad();}
+function cmLoad(){
+  if(!adm()){st('cmSt','비밀번호를 넣으면 남겨진 의견이 모두 보입니다.');$('cmList').innerHTML='';return;}
+  st('cmSt','불러오는 중…');
+  fetch(SUPA_URL+'/rest/v1/rpc/daisy_all',{method:'POST',headers:sbH(),body:JSON.stringify({p_pass:adm()})})
+    .then(function(r){if(!r.ok)return r.text().then(function(t){throw new Error(r.status===404?'의견 표가 아직 없습니다 · 안내된 SQL 을 Supabase 에서 먼저 실행하세요':('오류 '+r.status+' '+t.slice(0,120)));});return r.json();})
+    .then(function(rows){
+      CMS=Array.isArray(rows)?rows:[];
+      if(!CMS.length)st('cmSt','아직 의견이 없거나 비밀번호가 맞지 않습니다.');else st('cmSt','불러왔습니다','ok');
+      cmRender();render();
+    }).catch(function(e){st('cmSt',e.message,'err');});
+}
+function cmRender(){
+  var show=$('cmShowHidden').checked,list=CMS.filter(function(c){return show||!c.hidden;});
+  $('cmCnt').textContent=CMS.length?CMS.filter(function(c){return !c.hidden;}).length+'개'+(CMS.some(function(c){return c.hidden;})?' · 숨김 '+CMS.filter(function(c){return c.hidden;}).length:''):'';
+  if(!list.length){$('cmList').innerHTML='';return;}
+  var byEx={};DATA.items.forEach(function(x){byEx[String(x.id)]=x;});
+  $('cmList').innerHTML=list.map(function(c){
+    var ex=byEx[c.excerpt_id],snip=ex?ex.text:(c.excerpt_snip||'(지운 문장)');
+    var d=new Date(c.created_at),when=isNaN(d)?'':d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    return '<div class="it'+(c.hidden?' cm-hid':'')+'"><div class="q">'
+      +'<div class="cm-ex">«'+esc(String(snip).slice(0,70))+(String(snip).length>70?'…':'')+'»</div>'
+      +'<div class="tx" style="font-size:14.5px">'+esc(c.body)+'</div>'
+      +'<div class="src"><b style="color:var(--green)">'+esc(c.name||'익명')+'</b> · '+esc(when)+(c.hidden?' · <span style="color:var(--red)">숨김</span>':'')+'</div></div>'
+      +'<div class="act"><button class="'+(c.hidden?'':'del')+'" onclick="cmHide('+c.id+','+(!c.hidden)+')">'+(c.hidden?'되살리기':'숨기기')+'</button></div></div>';
+  }).join('');
+}
+function cmHide(id,hide){
+  if(hide&&!confirm('이 의견을 숨길까요? (데이지 화면에서 안 보이게 됩니다)'))return;
+  fetch(SUPA_URL+'/rest/v1/rpc/daisy_hide',{method:'POST',headers:sbH(),body:JSON.stringify({p_id:id,p_pass:adm(),p_hide:hide})})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(ok){if(!ok)throw new Error('비밀번호가 맞지 않습니다');var c=CMS.find(function(x){return x.id===id;});if(c)c.hidden=hide;cmRender();render();})
+    .catch(function(e){alert('바꾸지 못했습니다: '+e.message);});
+}
 /* ---- HMD 전체 백업 파일 → 독서 발췌 골라 담기 ---- */
 function plain(h){var d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|li)>/gi,'\n');return (d.textContent||'').replace(/\n{3,}/g,'\n\n').trim();}
 function hmdPick(inp){
@@ -223,8 +275,8 @@ function impAdd(){
   setDirty();render();
 }
 
-$('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');
-load();
+$('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');$('adm').value=ls('dz_adm');
+load().then(function(){cmLoad();});
 </script>
 </body>
 </html>

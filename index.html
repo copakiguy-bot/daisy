@@ -19,7 +19,6 @@
   .flower:active{transform:scale(.96)}
   .flower svg{width:100%;height:100%;display:block}
   .hint{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--muted)}
-  .petals{font-size:12px;color:#b5b9b4;letter-spacing:2px}
   .msg{font-size:13px;color:var(--muted);min-height:18px}
   /* 날아오는 꽃 · 떨어지는 꽃잎 */
   .daisy-dim{position:fixed;inset:0;background:rgba(18,49,43,.34);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:118}
@@ -40,6 +39,21 @@
   .ex-timer-label{font-size:12px;color:var(--muted);margin-top:6px}
   .ex-next{margin-top:22px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 18px;font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer}
   .ex-next:hover{border-color:var(--yellow);background:#fffbea}
+  .cm{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);text-align:left}
+  .cm-h{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px}
+  .cm-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+  .cm-it{background:var(--cream);border-radius:12px;padding:10px 13px}
+  .cm-m{display:flex;gap:8px;align-items:baseline;font-size:12px;color:var(--muted);margin-bottom:3px}
+  .cm-m b{color:var(--green);font-size:12.5px}
+  .cm-b{font-size:14px;line-height:1.7;color:var(--text);white-space:pre-line;word-break:break-word}
+  .cm-empty{font-size:13px;color:var(--muted)}
+  .cm-form textarea{width:100%;min-height:72px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:'Gowun Dodum',sans-serif;font-size:15px;line-height:1.6;color:var(--text);background:#fff}
+  .cm-form textarea:focus,.cm-row input:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 2px rgba(244,183,64,.18)}
+  .cm-row{display:flex;gap:8px;margin-top:8px}
+  .cm-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-family:inherit;font-size:13px;background:#fff}
+  .cm-send{flex:none;border:none;border-radius:9px;padding:8px 16px;background:var(--yellow);color:#3a2a00;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+  .cm-send:disabled{opacity:.5;cursor:default}
+  .cm-st{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px}
   @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-timer{font-size:38px}}
   @media (prefers-reduced-motion:reduce){.ex-box{animation:none}.daisy-fp{display:none}}
 </style>
@@ -47,15 +61,17 @@
 <body>
 <main class="stage">
   <button class="flower" id="flowerBtn" type="button" aria-label="데이지 누르기 · 문장 하나 꺼내기" title="눌러서 문장 하나 꺼내기"><svg id="headFlower" viewBox="0 0 100 100" aria-hidden="true"></svg></button>
-  <div class="hint">데이지를 눌러 보세요</div>
-  <div class="petals" id="petals" aria-hidden="true"></div>
+  <div class="hint">데이지를 눌러주세요.</div>
   <div class="msg" id="msg"></div>
 </main>
 
 <script>
 /* ===== 데이지: 꽃을 누르면 꽃잎이 하나 지고, 발췌문 하나가 뜬다 =====
    발췌문은 같은 폴더의 excerpts.json 에서 읽는다 (관리: admin.html) */
-var ITEMS=[], LOADED=false, LOAD_ERR='';
+/* 의견 저장소 (Supabase · HMD 와 같은 프로젝트의 daisy_comments 표) */
+var SUPA_URL='https://qjedpvzqpheggfyupkof.supabase.co', SUPA_KEY='sb_publishable_XzarJNgIdymB3HShYoPvnA_qe_ige_l';
+function sbH(extra){return Object.assign({apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'},extra||{});}
+var ITEMS=[], LOADED=false, LOAD_ERR='', CUR=null;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
 
@@ -116,7 +132,7 @@ function buildDaisy(svg,soft){
   }
   svg.innerHTML=s;
 }
-function paintPetals(){var p=document.getElementById('petals');if(p)p.textContent=daisyRemaining()?'꽃잎 '+daisyRemaining()+'장':'꽃잎이 다 졌어요 · 누르면 다시 핍니다';}
+function paintPetals(){}
 function daisySpawnFall(x,y){
   var fp=document.createElement('div');fp.className='daisy-fp';
   fp.style.left=(x-7)+'px';fp.style.top=(y-17)+'px';
@@ -193,7 +209,7 @@ function daisyClick(){
 var exTimer=null;
 function showExcerpt(){
   var it=pickItem();if(!it)return;
-  closeExcerpt();
+  closeExcerpt();CUR=it;
   var src=[it.author,it.book?'〈'+it.book+'〉':'',it.page?('p.'+String(it.page).replace(/^p\.?\s*/i,'')):''].filter(Boolean).join(' ');
   var ov=document.createElement('div');ov.className='ex-ov';ov.id='exOv';
   ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
@@ -204,10 +220,18 @@ function showExcerpt(){
     +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
     +'<div class="ex-timer" id="exTimer">05:00</div>'
     +'<div class="ex-timer-label">이 문장과 함께하는 5분</div>'
+    +'<section class="cm" aria-label="의견">'
+    +'<div class="cm-h">이 문장에 대한 생각</div>'
+    +'<div class="cm-list" id="cmList"><div class="cm-empty">불러오는 중…</div></div>'
+    +'<div class="cm-form"><textarea id="cmBody" maxlength="1000" placeholder="떠오른 생각을 남겨 주세요"></textarea>'
+    +'<div class="cm-row"><input id="cmName" maxlength="30" placeholder="이름 (선택)" value="'+esc(store('dz_name')||'')+'">'
+    +'<button type="button" class="cm-send" id="cmSend" onclick="cmPost()">남기기</button></div>'
+    +'<div class="cm-st" id="cmSt"></div></div></section>'
     +(ITEMS.length>1?'<button type="button" class="ex-next" onclick="closeExcerpt();daisyClick()">🌼 한 송이 더</button>':'')
     +'</div>';
   document.body.appendChild(ov);
   document.addEventListener('keydown',exEsc);
+  cmLoad(it);
   var left=300, tEl=document.getElementById('exTimer');
   exTimer=setInterval(function(){
     left--;
@@ -216,8 +240,39 @@ function showExcerpt(){
     if(left<=0){clearInterval(exTimer);exTimer=null;if(tEl){tEl.textContent='00:00';tEl.classList.add('done');}}
   },1000);
 }
-function exEsc(e){if(e.key==='Escape')closeExcerpt();}
-function closeExcerpt(){if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
+function exEsc(e){
+  if(e.key!=='Escape')return;
+  var a=document.activeElement;if(a&&(a.id==='cmBody'||a.id==='cmName')){a.blur();return;}   /* 쓰는 중이면 초점만 뺀다 */
+  closeExcerpt();
+}
+/* ---------- 의견: 문장마다 남긴 생각 (모두에게 보임 · 관리 페이지에서 숨길 수 있음) ---------- */
+function exKey(it){return String(it.id!=null?it.id:ITEMS.indexOf(it));}
+function fmtWhen(t){var d=new Date(t);if(isNaN(d))return '';var p=function(n){return String(n).padStart(2,'0');};return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}
+function cmLoad(it){
+  var box=document.getElementById('cmList');if(!box)return;
+  fetch(SUPA_URL+'/rest/v1/daisy_comments?select=id,name,body,created_at&excerpt_id=eq.'+encodeURIComponent(exKey(it))+'&order=created_at.asc',{headers:sbH()})
+    .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(rows){
+      if(CUR!==it)return;
+      box.innerHTML=rows.length?rows.map(function(c){return '<div class="cm-it"><div class="cm-m"><b>'+esc(c.name||'익명')+'</b><span>'+esc(fmtWhen(c.created_at))+'</span></div><div class="cm-b">'+esc(c.body)+'</div></div>';}).join('')
+        :'<div class="cm-empty">아직 남긴 생각이 없습니다. 처음으로 남겨 보세요.</div>';
+    }).catch(function(){box.innerHTML='<div class="cm-empty">의견을 불러오지 못했습니다.</div>';});
+}
+function cmPost(){
+  var it=CUR;if(!it)return;
+  var b=document.getElementById('cmBody'),n=document.getElementById('cmName'),btn=document.getElementById('cmSend'),stEl=document.getElementById('cmSt');
+  var body=String(b.value||'').trim(),name=String(n.value||'').trim().slice(0,30);
+  if(!body){b.focus();return;}
+  store('dz_name',name);
+  btn.disabled=true;stEl.textContent='남기는 중…';
+  fetch(SUPA_URL+'/rest/v1/daisy_comments',{method:'POST',headers:sbH({Prefer:'return=minimal'}),
+    body:JSON.stringify({excerpt_id:exKey(it),excerpt_snip:String(it.text).slice(0,120),name:name,body:body.slice(0,1000)})})
+    .then(function(r){if(!r.ok)throw new Error(r.status);
+      b.value='';stEl.textContent='남겼습니다 🌼';setTimeout(function(){if(stEl)stEl.textContent='';},2000);cmLoad(it);})
+    .catch(function(e){stEl.textContent='남기지 못했습니다 ('+e.message+') · 잠시 뒤 다시 해 주세요';})
+    .then(function(){btn.disabled=false;});
+}
+function closeExcerpt(){CUR=null;if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
 
 document.getElementById('flowerBtn').addEventListener('click',daisyClick);
 buildDaisy(document.getElementById('headFlower'),false);paintPetals();
