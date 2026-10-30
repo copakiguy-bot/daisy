@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f1efe8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="데이지">
+<link rel="apple-touch-icon" href="icon.png">
 <title>데이지</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23fff' stroke='%23333' stroke-width='2'%3E%3Cellipse cx='50' cy='24' rx='9' ry='20'/%3E%3Cellipse cx='50' cy='76' rx='9' ry='20'/%3E%3Cellipse cx='24' cy='50' rx='20' ry='9'/%3E%3Cellipse cx='76' cy='50' rx='20' ry='9'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='%23f5a623' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -38,7 +43,12 @@
   .ex-next svg{width:100%;height:100%;display:block}
   .ex-next:hover{transform:rotate(-12deg) scale(1.06);opacity:1}
   .ex-next:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:10px}
-  .cm{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);text-align:left}
+  .cm{margin-top:14px;padding-top:16px;border-top:1px solid var(--line);text-align:left}
+  .cm[hidden]{display:none}
+  .cm-tg-row{margin-top:22px;display:flex;justify-content:center}
+  .cm-tg{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+  .cm-tg:hover,.cm-tg.on{border-color:var(--yellow);color:var(--dark);background:#fffbea}
+  .cm-tg .n{color:var(--green)}
   .cm-h{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px}
   .cm-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
   .cm-list:empty{display:none}
@@ -218,8 +228,9 @@ function showExcerpt(){
     +'<button type="button" class="ex-close" onclick="closeExcerpt()" title="닫기 (Esc)" aria-label="닫기">✕</button>'
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
     +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
-    +'<section class="cm" aria-label="의견">'
-    +'<div class="cm-list" id="cmList"><div class="cm-empty">불러오는 중…</div></div>'
+    +'<div class="cm-tg-row"><button type="button" class="cm-tg" id="cmTg" onclick="cmToggle()" aria-expanded="false" aria-controls="cmSec">댓글<span class="n" id="cmN"></span></button></div>'
+    +'<section class="cm" id="cmSec" aria-label="댓글" hidden>'
+    +'<div class="cm-list" id="cmList"></div>'
     +'<div class="cm-form"><textarea id="cmBody" maxlength="1000"></textarea>'
     +'<div class="cm-row"><input id="cmName" maxlength="30" placeholder="이름 (선택)" value="'+esc(store('dz_name')||'')+'">'
     +'<button type="button" class="cm-send" id="cmSend" onclick="cmPost()">남기기</button></div>'
@@ -230,7 +241,15 @@ function showExcerpt(){
   document.addEventListener('keydown',exEsc);
   cmLoad(it);
 }
-/* 떨어진 데이지: 줄기째 옆으로 누운 꽃 + 흩어진 꽃잎 두 장 (누르면 한 송이 더) */
+/* 댓글은 «댓글» 단추를 눌러야 열린다 (처음엔 문장과 데이지만) */
+function cmToggle(){
+  var sec=document.getElementById('cmSec'),tg=document.getElementById('cmTg');if(!sec||!tg)return;
+  var open=sec.hasAttribute('hidden');
+  if(open)sec.removeAttribute('hidden');else sec.setAttribute('hidden','');
+  tg.classList.toggle('on',open);tg.setAttribute('aria-expanded',open?'true':'false');
+  if(open)setTimeout(function(){var b=document.getElementById('cmBody');if(b)b.focus({preventScroll:true});sec.scrollIntoView({block:'nearest',behavior:'smooth'});},30);
+}
+function cmCount(n){var e=document.getElementById('cmN');if(e)e.textContent=n?' '+n:'';}
 /* 다음 문장 단추: 심플한 데이지 한 송이 (흰 꽃잎 8장 + 노란 가운데) */
 function fallenDaisySVG(){
   var g='';
@@ -251,6 +270,7 @@ function cmLoad(it){
     .then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
     .then(function(rows){
       if(CUR!==it)return;
+      cmCount(rows.length);
       box.innerHTML=rows.length?rows.map(function(c){return '<div class="cm-it"><div class="cm-m"><b>'+esc(c.name||'익명')+'</b><span>'+esc(fmtWhen(c.created_at))+'</span></div><div class="cm-b">'+esc(c.body)+'</div></div>';}).join('')
         :'';
     }).catch(function(){if(CUR===it)box.innerHTML='';});
