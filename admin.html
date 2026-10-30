@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>데이지 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--dark:#12312b;--text:#2b3a36;--muted:#8a9490;--line:#e9e6df;--cream:#faf8f2;--green:#2f6f5e;--yellow:#f4b740;--red:#e34948;--card:#fff;--bg:#f1efe8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Sans KR',system-ui,sans-serif;font-size:14px;padding:28px 16px 60px}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-size:24px;color:var(--dark);margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  h1 a{font-size:12.5px;font-weight:700;color:var(--green);text-decoration:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 11px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .card{background:var(--card);border-radius:16px;padding:18px 20px;box-shadow:0 8px 24px rgba(18,49,43,.06);margin-bottom:14px}
+  .card h2{font-size:14.5px;color:var(--dark);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .card h2 .more{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .in{border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-family:inherit;font-size:13.5px;background:#fff;color:var(--text);min-width:0}
+  .in:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 2px rgba(244,183,64,.18)}
+  textarea.in{width:100%;min-height:110px;resize:vertical;line-height:1.7;font-family:'Gowun Dodum',sans-serif;font-size:15px}
+  .btn{border:none;border-radius:9px;padding:8px 15px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--yellow);color:#3a2a00;white-space:nowrap}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--dark)}
+  .btn.dark{background:var(--dark);color:#fff}
+  .btn:disabled{opacity:.45;cursor:default}
+  .st{font-size:12.5px;color:var(--muted);margin-top:8px;min-height:18px}
+  .st.ok{color:var(--green)} .st.err{color:var(--red)}
+  .save-bar{position:sticky;top:0;z-index:5;display:none;align-items:center;gap:10px;background:#fff7dd;border:1px solid #f3dc9a;border-radius:12px;padding:10px 14px;margin-bottom:14px}
+  .save-bar.on{display:flex}
+  .save-bar b{color:#7a5a00}
+  .save-bar .btn{margin-left:auto}
+  .it{border-top:1px dashed var(--line);padding:12px 2px;display:flex;gap:12px;align-items:flex-start}
+  .it:first-child{border-top:none}
+  .it .q{flex:1;min-width:0}
+  .it .tx{font-family:'Gowun Dodum',sans-serif;font-size:15px;line-height:1.75;color:var(--dark);white-space:pre-line;word-break:keep-all}
+  .it .src{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .it .act{flex:none;display:flex;gap:4px}
+  .it .act button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 9px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--dark)}
+  .it .act button.del{color:var(--red)}
+  .it.edit{background:#fffbea;border-radius:10px;padding:12px}
+  .empty{color:var(--muted);font-size:13px;padding:14px 0;text-align:center}
+  .imp{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+  .imp label{display:flex;gap:10px;padding:9px 12px;border-top:1px solid var(--line);cursor:pointer;align-items:flex-start}
+  .imp label:first-child{border-top:none}
+  .imp label:hover{background:var(--cream)}
+  .imp .t{font-family:'Gowun Dodum',sans-serif;font-size:14px;line-height:1.6;color:var(--dark)}
+  .imp .s{font-size:12px;color:var(--muted);margin-top:2px}
+  .imp .dup{opacity:.45}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px}
+  .help{font-size:12.5px;color:var(--muted);line-height:1.75;margin-top:8px}
+  .help code{background:var(--cream);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌼 데이지 관리 <a href="./" target="_blank" rel="noopener">데이지 열기 ↗</a></h1>
+  <div class="sub">여기서 고친 문장은 «게시»를 누르면 데이지 화면에 1~2분 안에 반영됩니다.</div>
+
+  <div class="save-bar" id="saveBar"><b id="dirtyTxt">바뀐 내용이 있습니다</b><button class="btn dark" id="saveBtn" onclick="publish()">게시하기</button></div>
+
+  <div class="card" id="cfgCard">
+    <h2>연결 <span class="more" id="connInfo"></span></h2>
+    <div class="row">
+      <input id="repo" class="in" style="flex:1;min-width:200px" placeholder="깃허브계정/저장소 (예: copakiguy-bot/daisy)">
+      <input id="tok" class="in" type="password" style="flex:1.4;min-width:200px" placeholder="깃허브 토큰 (이 기기에만 저장)" autocomplete="off">
+      <button class="btn ghost" onclick="saveCfg()">저장 · 불러오기</button>
+    </div>
+    <div class="st" id="cfgSt"></div>
+    <details><summary>토큰은 어디서 받나요?</summary>
+      <div class="help">깃허브 오른쪽 위 프로필 → <b>Settings</b> → 맨 아래 <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.<br>
+      Repository access 에서 <code>daisy</code> 를 고르고, Permissions → Repository permissions → <b>Contents: Read and write</b>. 만들어진 토큰(github_pat_…)을 위 칸에 넣으세요.<br>
+      토큰은 이 브라우저에만 저장되고 데이지 화면이나 저장소에는 올라가지 않습니다.</div></details>
+  </div>
+
+  <div class="card">
+    <h2>문장 추가</h2>
+    <textarea id="nText" class="in" placeholder="발췌 문장"></textarea>
+    <div class="row" style="margin-top:8px">
+      <input id="nBook" class="in" list="bookList" style="flex:1.3;min-width:130px" placeholder="책 제목">
+      <input id="nAuthor" class="in" list="authorList" style="flex:1;min-width:110px" placeholder="저자">
+      <input id="nPage" class="in" style="width:80px" placeholder="쪽">
+      <button class="btn" onclick="addItem()">＋ 추가</button>
+    </div>
+    <datalist id="bookList"></datalist><datalist id="authorList"></datalist>
+  </div>
+
+  <div class="card">
+    <h2>문장 목록 <span class="more" id="cnt"></span></h2>
+    <input id="q" class="in" style="width:100%;margin-bottom:6px" placeholder="찾기 (문장 · 책 · 저자)" oninput="render()">
+    <div id="list"><div class="empty">불러오는 중…</div></div>
+  </div>
+
+  <div class="card">
+    <h2>HMD에서 가져오기</h2>
+    <div class="help" style="margin-top:0">HMD <b>설정 → 전체 데이터 백업 → 전체 데이터 받기</b>로 받은 파일(HMD_전체백업_….json)을 고르면, 독서 발췌가 목록으로 나옵니다. 고른 것만 추가됩니다.</div>
+    <div class="row" style="margin-top:8px"><input type="file" id="hmdFile" accept=".json,application/json" onchange="hmdPick(this)"></div>
+    <div id="impBox"></div>
+  </div>
+</div>
+
+<script>
+var DATA={title:'데이지',items:[]}, SHA=null, DIRTY=false, EDIT=null, IMP=[];
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||'';if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return '';}}
+function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function st(id,t,cls){var e=$(id);if(e){e.textContent=t||'';e.className='st'+(cls?' '+cls:'');}}
+function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
+function b64dec(s){return decodeURIComponent(escape(atob(String(s).replace(/\s/g,''))));}
+
+/* 저장소 주소: 비어 있으면 지금 주소(…github.io/저장소/)에서 짐작 */
+function guessRepo(){
+  var m=/^([a-z0-9-]+)\.github\.io$/i.exec(location.hostname),p=location.pathname.split('/').filter(Boolean)[0];
+  return m&&p?m[1]+'/'+p:'copakiguy-bot/daisy';
+}
+function repo(){return ($('repo').value||'').trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/$/,'');}
+function tok(){return ($('tok').value||'').trim();}
+function apiUrl(){return 'https://api.github.com/repos/'+repo()+'/contents/excerpts.json';}
+function hdr(){var h={'Accept':'application/vnd.github+json'};if(tok())h.Authorization='Bearer '+tok();return h;}
+
+function saveCfg(){ls('dz_repo',repo());ls('dz_tok',tok()||null);load();}
+function load(){
+  st('cfgSt','불러오는 중…');
+  var p=tok()?fetch(apiUrl()+'?ref=main&t='+Date.now(),{headers:hdr(),cache:'no-store'}).then(function(r){
+      if(r.status===404){SHA=null;return {items:[]};}
+      if(!r.ok)throw new Error(r.status===401?'토큰이 맞지 않습니다 (401)':r.status===403?'권한이 없습니다 (403) · 토큰의 Contents 권한을 확인하세요':'오류 '+r.status);
+      return r.json().then(function(j){SHA=j.sha;return JSON.parse(b64dec(j.content));});})
+    :fetch('excerpts.json?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('excerpts.json 을 찾을 수 없습니다 ('+r.status+')');return r.json();});
+  return p.then(function(j){
+    DATA=Array.isArray(j)?{title:'데이지',items:j}:(j||{});if(!Array.isArray(DATA.items))DATA.items=[];
+    DATA.items.forEach(function(x,i){if(x.id==null)x.id=i+1;});
+    DIRTY=false;EDIT=null;render();
+    st('cfgSt',tok()?'연결됨 · 고친 뒤 «게시하기»를 누르면 저장됩니다':'읽기 전용 · 토큰을 넣어야 게시할 수 있습니다',tok()?'ok':'');
+  }).catch(function(e){st('cfgSt',e.message,'err');$('list').innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
+}
+
+function nextId(){return DATA.items.reduce(function(m,x){return Math.max(m,Number(x.id)||0);},0)+1;}
+function setDirty(){DIRTY=true;paintBar();}
+function paintBar(){
+  $('saveBar').classList.toggle('on',DIRTY);
+  $('saveBtn').disabled=!tok();
+  $('dirtyTxt').textContent=tok()?'바뀐 내용이 있습니다 · 게시해야 데이지에 반영됩니다':'바뀐 내용이 있습니다 · 게시하려면 위 «연결»에 토큰을 넣으세요';
+}
+function srcStr(x){return [x.author,x.book?'〈'+x.book+'〉':'',x.page?'p.'+x.page:''].filter(Boolean).join(' ');}
+function render(){
+  var q=($('q').value||'').trim().toLowerCase();
+  var list=DATA.items.slice().reverse().filter(function(x){return !q||(x.text+' '+(x.book||'')+' '+(x.author||'')).toLowerCase().indexOf(q)>=0;});
+  $('cnt').textContent=DATA.items.length+'개';
+  var books={},authors={};DATA.items.forEach(function(x){if(x.book)books[x.book]=1;if(x.author)authors[x.author]=1;});
+  $('bookList').innerHTML=Object.keys(books).map(function(b){return '<option value="'+esc(b)+'">';}).join('');
+  $('authorList').innerHTML=Object.keys(authors).map(function(b){return '<option value="'+esc(b)+'">';}).join('');
+  if(!list.length){$('list').innerHTML='<div class="empty">'+(q?'찾는 문장이 없습니다.':'아직 문장이 없습니다. 위에서 추가하세요.')+'</div>';paintBar();return;}
+  $('list').innerHTML=list.map(function(x){
+    if(EDIT===x.id)return '<div class="it edit"><div class="q">'
+      +'<textarea class="in" id="eText">'+esc(x.text)+'</textarea>'
+      +'<div class="row" style="margin-top:6px"><input id="eBook" class="in" list="bookList" style="flex:1.3" value="'+esc(x.book||'')+'" placeholder="책 제목">'
+      +'<input id="eAuthor" class="in" list="authorList" style="flex:1" value="'+esc(x.author||'')+'" placeholder="저자">'
+      +'<input id="ePage" class="in" style="width:80px" value="'+esc(x.page||'')+'" placeholder="쪽">'
+      +'<button class="btn" onclick="editSave('+x.id+')">확인</button><button class="btn ghost" onclick="EDIT=null;render()">취소</button></div></div></div>';
+    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x))+'</div></div>'
+      +'<div class="act"><button onclick="EDIT='+x.id+';render()">고치기</button><button class="del" onclick="delItem('+x.id+')">지우기</button></div></div>';
+  }).join('');
+  paintBar();
+}
+function addItem(){
+  var t=$('nText').value.trim();if(!t){alert('문장을 넣으세요.');$('nText').focus();return;}
+  if(DATA.items.some(function(x){return x.text.trim()===t;})){if(!confirm('같은 문장이 이미 있습니다. 그래도 추가할까요?'))return;}
+  DATA.items.push({id:nextId(),text:t,book:$('nBook').value.trim(),author:$('nAuthor').value.trim(),page:$('nPage').value.trim().replace(/^p\.?\s*/i,''),added:today()});
+  $('nText').value='';$('nPage').value='';setDirty();render();$('nText').focus();
+}
+function editSave(id){
+  var x=DATA.items.find(function(a){return a.id===id;});if(!x)return;
+  var t=$('eText').value.trim();if(!t){alert('문장이 비었습니다.');return;}
+  x.text=t;x.book=$('eBook').value.trim();x.author=$('eAuthor').value.trim();x.page=$('ePage').value.trim().replace(/^p\.?\s*/i,'');
+  EDIT=null;setDirty();render();
+}
+function delItem(id){
+  var x=DATA.items.find(function(a){return a.id===id;});if(!x)return;
+  if(!confirm('이 문장을 지울까요?\n\n'+x.text.slice(0,80)))return;
+  DATA.items=DATA.items.filter(function(a){return a.id!==id;});setDirty();render();
+}
+function publish(){
+  if(!tok()){alert('위 «연결»에 깃허브 토큰을 넣으세요.');return;}
+  var body={message:'데이지 문장 '+DATA.items.length+'개 ('+today()+')',content:b64enc(JSON.stringify(DATA,null,2)+'\n'),branch:'main'};
+  if(SHA)body.sha=SHA;
+  $('saveBtn').disabled=true;$('dirtyTxt').textContent='게시하는 중…';
+  fetch(apiUrl(),{method:'PUT',headers:Object.assign(hdr(),{'Content-Type':'application/json'}),body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(j){return {r:r,j:j};});})
+    .then(function(o){
+      if(o.r.status===409||o.r.status===422&&/sha/i.test(o.j.message||'')){throw new Error('다른 곳에서 먼저 바뀌었습니다. «저장 · 불러오기»로 새로 불러온 뒤 다시 해 주세요.');}
+      if(!o.r.ok)throw new Error((o.j&&o.j.message)||('오류 '+o.r.status));
+      SHA=o.j.content&&o.j.content.sha;DIRTY=false;paintBar();
+      st('cfgSt','게시했습니다 · 1~2분 뒤 데이지에 반영됩니다','ok');
+    }).catch(function(e){$('saveBtn').disabled=false;paintBar();alert('게시하지 못했습니다.\n\n'+e.message);});
+}
+window.addEventListener('beforeunload',function(e){if(DIRTY){e.preventDefault();e.returnValue='';}});
+
+/* ---- HMD 전체 백업 파일 → 독서 발췌 골라 담기 ---- */
+function plain(h){var d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|li)>/gi,'\n');return (d.textContent||'').replace(/\n{3,}/g,'\n\n').trim();}
+function hmdPick(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var j=null;try{j=JSON.parse(rd.result);}catch(e){}
+    var d=j&&j.data?j.data:j;
+    if(!d||!Array.isArray(d.reading)){$('impBox').innerHTML='<div class="st err">HMD 전체 백업 파일이 아닙니다.</div>';return;}
+    IMP=[];d.reading.forEach(function(b){(b.excerpts||[]).forEach(function(e){var t=plain(e.text);if(t)IMP.push({text:t,book:b.title||'',author:String(b.author||'').split('/')[0].trim(),page:String(e.page||'').trim()});});});
+    var have={};DATA.items.forEach(function(x){have[x.text.trim()]=1;});
+    $('impBox').innerHTML=IMP.length?('<div class="row" style="margin-top:10px"><span class="st" style="margin:0">발췌 '+IMP.length+'개 · 이미 있는 문장은 흐리게</span>'
+      +'<button class="btn" style="margin-left:auto" onclick="impAdd()">고른 것 추가</button></div>'
+      +'<div class="imp">'+IMP.map(function(x,i){var dup=have[x.text];return '<label class="'+(dup?'dup':'')+'"><input type="checkbox" data-i="'+i+'"'+(dup?' disabled':'')+'><div><div class="t">'+esc(x.text)+'</div><div class="s">'+esc(srcStr(x))+'</div></div></label>';}).join('')+'</div>')
+      :'<div class="st">이 파일에는 독서 발췌가 없습니다.</div>';
+  };
+  rd.readAsText(f);inp.value='';
+}
+function impAdd(){
+  var n=0;document.querySelectorAll('#impBox input[type=checkbox]:checked').forEach(function(c){var x=IMP[+c.getAttribute('data-i')];if(!x)return;
+    DATA.items.push({id:nextId(),text:x.text,book:x.book,author:x.author,page:x.page,added:today()});n++;});
+  if(!n){alert('추가할 문장을 고르세요.');return;}
+  $('impBox').innerHTML='<div class="st ok">'+n+'개를 추가했습니다 · 위 «게시하기»를 눌러 저장하세요</div>';
+  setDirty();render();
+}
+
+$('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');
+load();
+</script>
+</body>
+</html>

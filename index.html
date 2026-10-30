@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f1efe8">
+<title>데이지</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23fff' stroke='%23333' stroke-width='2'%3E%3Cellipse cx='50' cy='24' rx='9' ry='20'/%3E%3Cellipse cx='50' cy='76' rx='9' ry='20'/%3E%3Cellipse cx='24' cy='50' rx='20' ry='9'/%3E%3Cellipse cx='76' cy='50' rx='20' ry='9'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='%23f5a623' stroke='%23333' stroke-width='2'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--dark:#12312b;--text:#2b3a36;--muted:#8a9490;--line:#e9e6df;--cream:#faf8f2;--green:#2f6f5e;--yellow:#f4b740;--red:#e34948;--card:#fff;--bg:#f1efe8}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 16px;-webkit-tap-highlight-color:transparent}
+  /* 가운데 데이지 */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+  .flower{width:132px;height:132px;cursor:pointer;border:none;background:none;padding:0;transition:transform .25s ease}
+  .flower:hover{transform:rotate(-8deg) scale(1.04)}
+  .flower:active{transform:scale(.96)}
+  .flower svg{width:100%;height:100%;display:block}
+  .hint{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--muted)}
+  .petals{font-size:12px;color:#b5b9b4;letter-spacing:2px}
+  .msg{font-size:13px;color:var(--muted);min-height:18px}
+  /* 날아오는 꽃 · 떨어지는 꽃잎 */
+  .daisy-dim{position:fixed;inset:0;background:rgba(18,49,43,.34);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:118}
+  .daisy-fly{position:fixed;z-index:119;pointer-events:none;line-height:0;filter:drop-shadow(0 8px 22px rgba(18,49,43,.12));will-change:transform}
+  .daisy-fly svg{display:block;width:100%;height:100%}
+  .daisy-fp{position:fixed;z-index:121;width:14px;height:34px;background:#f7f5f0;border:none;border-radius:55% 55% 50% 50% / 65% 65% 42% 42%;pointer-events:none;box-shadow:0 2px 10px rgba(18,49,43,.08);animation:daisyfall 1.25s cubic-bezier(.4,.15,.7,1) forwards}
+  @keyframes daisyfall{0%{opacity:1;transform:translate(0,0) rotate(0)}12%{opacity:1}100%{opacity:0;transform:translate(var(--dx,20px),230px) rotate(var(--rot,200deg))}}
+  /* 발췌 카드 */
+  .ex-ov{position:fixed;inset:0;background:rgba(18,49,43,.55);display:flex;align-items:center;justify-content:center;z-index:120;padding:20px}
+  .ex-box{background:var(--card);border-radius:22px;padding:46px 42px 34px;max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto;text-align:center;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:expop .5s cubic-bezier(.2,.9,.25,1)}
+  @keyframes expop{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
+  .ex-close{position:absolute;top:14px;right:20px;cursor:pointer;font-size:20px;color:var(--muted);line-height:1;background:none;border:none;padding:4px}
+  .ex-close:hover{color:var(--dark)}
+  .ex-quote{font-size:clamp(16px,2.4vw,20px);line-height:1.85;color:var(--dark);font-family:'Gowun Dodum',sans-serif;word-break:keep-all;white-space:pre-line}
+  .ex-src{margin-top:18px;font-size:14px;color:var(--muted)}
+  .ex-timer{margin-top:26px;font-size:46px;font-weight:800;letter-spacing:1px;color:var(--green);font-variant-numeric:tabular-nums;line-height:1}
+  .ex-timer.done{color:var(--red)}
+  .ex-timer-label{font-size:12px;color:var(--muted);margin-top:6px}
+  .ex-next{margin-top:22px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 18px;font-family:inherit;font-size:13px;color:var(--dark);cursor:pointer}
+  .ex-next:hover{border-color:var(--yellow);background:#fffbea}
+  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-timer{font-size:38px}}
+  @media (prefers-reduced-motion:reduce){.ex-box{animation:none}.daisy-fp{display:none}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <button class="flower" id="flowerBtn" type="button" aria-label="데이지 누르기 · 문장 하나 꺼내기" title="눌러서 문장 하나 꺼내기"><svg id="headFlower" viewBox="0 0 100 100" aria-hidden="true"></svg></button>
+  <div class="hint">데이지를 눌러 보세요</div>
+  <div class="petals" id="petals" aria-hidden="true"></div>
+  <div class="msg" id="msg"></div>
+</main>
+
+<script>
+/* ===== 데이지: 꽃을 누르면 꽃잎이 하나 지고, 발췌문 하나가 뜬다 =====
+   발췌문은 같은 폴더의 excerpts.json 에서 읽는다 (관리: admin.html) */
+var ITEMS=[], LOADED=false, LOAD_ERR='';
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
+
+function loadExcerpts(){
+  return fetch('excerpts.json?t='+Date.now(),{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw new Error(r.status);return r.json();
+  }).then(function(j){
+    var list=Array.isArray(j)?j:(j&&j.items)||[];
+    ITEMS=list.filter(function(x){return x&&String(x.text||'').trim();});
+    LOADED=true;LOAD_ERR='';msg('');
+  }).catch(function(e){LOADED=true;LOAD_ERR='문장을 불러오지 못했습니다 ('+e.message+')';msg(LOAD_ERR);});
+}
+function msg(t){var m=document.getElementById('msg');if(m)m.textContent=t||'';}
+
+/* 같은 문장이 연달아 나오지 않게: 한 바퀴 다 돌 때까지 섞인 순서대로 (이 기기에 기억) */
+function pickItem(){
+  if(!ITEMS.length)return null;
+  var ids=ITEMS.map(function(x,i){return String(x.id!=null?x.id:i);});
+  var bag=(store('dz_bag')||[]).filter(function(id){return ids.indexOf(id)>=0;});
+  var last=store('dz_last');
+  if(!bag.length){
+    bag=ids.slice();
+    for(var i=bag.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=bag[i];bag[i]=bag[j];bag[j]=t;}
+    if(bag.length>1&&bag[0]===last){bag.push(bag.shift());}
+  }
+  var id=bag.shift();store('dz_bag',bag);store('dz_last',id);
+  return ITEMS[ids.indexOf(id)];
+}
+
+/* ---------- 데이지 그림 (HMD 와 같은 꽃) ---------- */
+var DAISY_N=8, daisyAnimating=false;
+var daisyDropped=store('dz_dropped')||[];
+var daisyStart=Math.round(60/(360/DAISY_N))%DAISY_N;            // 2시 위치부터
+var daisyOrder=[];for(var _k=0;_k<DAISY_N;_k++)daisyOrder.push(((daisyStart-_k)%DAISY_N+DAISY_N)%DAISY_N);
+function daisyRemaining(){return DAISY_N-daisyDropped.length;}
+function buildDaisy(svg,soft){
+  var s='',i,a;
+  if(!soft){
+    for(i=0;i<DAISY_N;i++){
+      a=i*(360/DAISY_N);
+      s+='<g data-i="'+i+'"'+(daisyDropped.indexOf(i)>=0?' style="opacity:0"':'')+' transform="rotate('+a+' 50 50)">'
+        +'<path d="M50 51 C43.5 45 41.5 26 46 14 C47.4 9.6 52.6 9.6 54 14 C58.5 26 56.5 45 50 51 Z" fill="#ffffff" stroke="#333333" stroke-width="1.1" stroke-linejoin="round"/></g>';
+    }
+    s+='<circle cx="50" cy="50" r="12" fill="#f5a623" stroke="#333333" stroke-width="1.1"/>';
+  }else{
+    var shapes=['M50 52 C44 47 39.5 31 43 16 C45.2 8.2 54.8 8.2 57 16 C60.5 31 56 47 50 52 Z',
+      'M50 52 C43.5 46.5 39 30 43.8 15.5 C46 7.8 55 8.2 56.5 15.8 C60 30.5 55.5 46.5 50 52 Z',
+      'M50 52 C44.5 47.5 40 31.5 42.5 15.5 C44.8 7.8 55.5 7.6 57.5 16 C60.8 31 55.8 46.8 50 52 Z'];
+    var tones=['#f6f5f3','#f4f3f0','#f7f6f4','#f3f2ef'];
+    for(i=0;i<DAISY_N;i++){
+      a=i*(360/DAISY_N)+(((i*137)%9)-4);var sc=1+((((i*89)%5)-2)*0.015),tr=(50*(1-sc)/sc).toFixed(2);
+      s+='<g data-i="'+i+'"'+(daisyDropped.indexOf(i)>=0?' style="opacity:0"':'')
+        +' transform="rotate('+a+' 50 50) scale('+sc+') translate('+tr+' '+tr+')">'
+        +'<path d="'+shapes[i%3]+'" fill="'+tones[i%4]+'"/>'
+        +'<ellipse cx="50" cy="43" rx="4" ry="5" fill="#f4e4dd" opacity="0.22"/></g>';
+    }
+    s+='<path d="M50 39.6 C55.5 39.4 60.4 43.6 60.5 49.4 C60.7 55.4 56.1 60.2 50.3 60.4 C44.3 60.6 39.6 55.9 39.5 50 C39.4 44 44.5 39.9 50 39.6 Z" fill="#e8812e"/>';
+  }
+  svg.innerHTML=s;
+}
+function paintPetals(){var p=document.getElementById('petals');if(p)p.textContent=daisyRemaining()?'꽃잎 '+daisyRemaining()+'장':'꽃잎이 다 졌어요 · 누르면 다시 핍니다';}
+function daisySpawnFall(x,y){
+  var fp=document.createElement('div');fp.className='daisy-fp';
+  fp.style.left=(x-7)+'px';fp.style.top=(y-17)+'px';
+  fp.style.setProperty('--dx',(Math.random()*100-50).toFixed(0)+'px');
+  fp.style.setProperty('--rot',((Math.random()*180+140)*(Math.random()<.5?-1:1)).toFixed(0)+'deg');
+  document.body.appendChild(fp);setTimeout(function(){fp.remove();},1350);
+}
+
+/* ---------- 누르기: 꽃이 날아올라 꽃잎 하나 지고 → 문장 ---------- */
+function daisyClick(){
+  if(daisyAnimating)return;
+  if(!LOADED){msg('불러오는 중…');return;}
+  if(!ITEMS.length){msg(LOAD_ERR||'아직 등록된 문장이 없습니다.');return;}
+  daisyAnimating=true;
+  closeExcerpt();
+  var wasEmpty=(daisyRemaining()<=0);
+  if(wasEmpty){daisyDropped=[];store('dz_dropped',daisyDropped);}
+  var head=document.getElementById('headFlower');
+  buildDaisy(head,false);
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){
+    if(!wasEmpty){daisyDropped.push(daisyOrder[daisyDropped.length]);store('dz_dropped',daisyDropped);buildDaisy(head,false);}
+    paintPetals();showExcerpt();daisyAnimating=false;return;
+  }
+  var dim=document.createElement('div');dim.className='daisy-dim';document.body.appendChild(dim);
+  var fly=document.createElement('div');fly.className='daisy-fly';
+  fly.innerHTML='<svg viewBox="0 0 100 100" aria-hidden="true"></svg>';
+  document.body.appendChild(fly);
+  var flySvg=fly.querySelector('svg');buildDaisy(flySvg,true);
+  var r=head.getBoundingClientRect();
+  var sx=r.left+r.width/2, sy=r.top+r.height/2, sSize=Math.max(r.width,20);
+  var ex=window.innerWidth/2, ey=window.innerHeight/2-40, eSize=Math.min(250,window.innerWidth*0.6);
+  var arcLift=Math.min(180,Math.abs(ex-sx)*.25+70);
+  var t0=performance.now(), DUR=1500, dropMid=false;
+  function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;}
+  function frame(now){
+    var t=Math.min(1,(now-t0)/DUR), e=ease(t);
+    var x=sx+(ex-sx)*e, y=sy+(ey-sy)*e, size=sSize+(eSize-sSize)*e;
+    y+=Math.sin(Math.PI*e)*arcLift;
+    x+=Math.sin(e*Math.PI*3)*(1-e)*26;
+    y+=Math.sin(e*Math.PI*5)*(1-e)*7;
+    var wob=Math.sin(e*Math.PI*4)*(1-e)*14;
+    fly.style.width=size+'px';fly.style.height=size+'px';
+    fly.style.left=(x-size/2)+'px';fly.style.top=(y-size/2)+'px';
+    fly.style.transform='rotate('+(e*540+wob)+'deg)';
+    if(!dropMid&&t>=0.55&&!wasEmpty){
+      dropMid=true;
+      daisyDropped.push(daisyOrder[daisyDropped.length]);store('dz_dropped',daisyDropped);
+      buildDaisy(head,false);buildDaisy(flySvg,true);paintPetals();
+      daisySpawnFall(x,y);
+    }
+    if(t<1)requestAnimationFrame(frame);else linger();
+  }
+  function linger(){
+    var l0=performance.now(), LDUR=1000, FADE=380;
+    function lf(now){
+      var lt=Math.min(1,(now-l0)/LDUR);
+      var breathe=1+Math.sin(lt*Math.PI*2)*0.018, bob=Math.sin(lt*Math.PI*2)*3.5, sway=Math.sin(lt*Math.PI*2+1)*2.5;
+      var size=eSize*breathe;
+      fly.style.width=size+'px';fly.style.height=size+'px';
+      fly.style.left=(ex-size/2)+'px';fly.style.top=(ey-size/2+bob)+'px';
+      fly.style.transform='rotate('+(540+sway)+'deg)';
+      var fs=(LDUR-FADE)/LDUR;
+      fly.style.opacity=lt<fs?'1':String(Math.max(0,1-(lt-fs)/(1-fs)));
+      if(lt<1)requestAnimationFrame(lf);
+      else{fly.remove();dim.remove();paintPetals();showExcerpt();daisyAnimating=false;}
+    }
+    requestAnimationFrame(lf);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- 발췌 카드 (5분 타이머 = 그 문장을 곱씹는 시간) ---------- */
+var exTimer=null;
+function showExcerpt(){
+  var it=pickItem();if(!it)return;
+  closeExcerpt();
+  var src=[it.author,it.book?'〈'+it.book+'〉':'',it.page?('p.'+String(it.page).replace(/^p\.?\s*/i,'')):''].filter(Boolean).join(' ');
+  var ov=document.createElement('div');ov.className='ex-ov';ov.id='exOv';
+  ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  ov.onclick=function(e){if(e.target===ov)closeExcerpt();};
+  ov.innerHTML='<div class="ex-box">'
+    +'<button type="button" class="ex-close" onclick="closeExcerpt()" title="닫기 (Esc)" aria-label="닫기">✕</button>'
+    +'<div class="ex-quote">'+esc(it.text)+'</div>'
+    +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
+    +'<div class="ex-timer" id="exTimer">05:00</div>'
+    +'<div class="ex-timer-label">이 문장과 함께하는 5분</div>'
+    +(ITEMS.length>1?'<button type="button" class="ex-next" onclick="closeExcerpt();daisyClick()">🌼 한 송이 더</button>':'')
+    +'</div>';
+  document.body.appendChild(ov);
+  document.addEventListener('keydown',exEsc);
+  var left=300, tEl=document.getElementById('exTimer');
+  exTimer=setInterval(function(){
+    left--;
+    var m=Math.floor(left/60), sc=left%60;
+    if(tEl)tEl.textContent=(m<10?'0':'')+m+':'+(sc<10?'0':'')+sc;
+    if(left<=0){clearInterval(exTimer);exTimer=null;if(tEl){tEl.textContent='00:00';tEl.classList.add('done');}}
+  },1000);
+}
+function exEsc(e){if(e.key==='Escape')closeExcerpt();}
+function closeExcerpt(){if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
+
+document.getElementById('flowerBtn').addEventListener('click',daisyClick);
+buildDaisy(document.getElementById('headFlower'),false);paintPetals();
+loadExcerpts();
+</script>
+</body>
+</html>
