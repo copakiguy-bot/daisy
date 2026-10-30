@@ -32,8 +32,14 @@
   .daisy-fp{position:fixed;z-index:121;width:14px;height:34px;background:#f7f5f0;border:none;border-radius:55% 55% 50% 50% / 65% 65% 42% 42%;pointer-events:none;box-shadow:0 2px 10px rgba(18,49,43,.08);animation:daisyfall 1.25s cubic-bezier(.4,.15,.7,1) forwards}
   @keyframes daisyfall{0%{opacity:1;transform:translate(0,0) rotate(0)}12%{opacity:1}100%{opacity:0;transform:translate(var(--dx,20px),230px) rotate(var(--rot,200deg))}}
   /* 발췌 카드 */
-  .ex-ov{position:fixed;inset:0;background:rgba(18,49,43,.55);display:flex;align-items:center;justify-content:center;z-index:120;padding:20px}
-  .ex-box{background:var(--card);border-radius:22px;padding:46px 42px 34px;max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto;text-align:center;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:expop .5s cubic-bezier(.2,.9,.25,1)}
+  .ex-ov{position:fixed;inset:0;background:rgba(18,49,43,.55);display:flex;align-items:center;justify-content:center;z-index:120;padding:20px;animation:ovIn 1.1s ease both}
+  @keyframes ovIn{from{background:rgba(18,49,43,.34)}to{background:rgba(18,49,43,.55)}}
+  @keyframes boxIn{0%{opacity:0;transform:translateY(12px) scale(.985)}100%{opacity:1;transform:none}}
+  @keyframes txtIn{0%{opacity:0;filter:blur(3px)}100%{opacity:1;filter:blur(0)}}
+  .ex-box>.ex-quote{animation:txtIn 1.5s .35s ease-out both}
+  .ex-box>.ex-src{animation:txtIn 1.2s .9s ease-out both}
+  .ex-box>.cm-tg-row,.ex-box>.ex-next{animation:txtIn 1s 1.2s ease-out both}
+  .ex-box{background:var(--card);border-radius:22px;padding:46px 42px 34px;max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto;text-align:center;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:boxIn 1.1s cubic-bezier(.22,.8,.3,1) both}
   @keyframes expop{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
   .ex-close{position:absolute;top:14px;right:20px;cursor:pointer;font-size:20px;color:var(--muted);line-height:1;background:none;border:none;padding:4px}
   .ex-close:hover{color:var(--dark)}
@@ -43,9 +49,10 @@
   .ex-next svg{width:100%;height:100%;display:block}
   .ex-next:hover{transform:rotate(-12deg) scale(1.06);opacity:1}
   .ex-next:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:10px}
-  .cm{margin-top:14px;padding-top:16px;border-top:1px solid var(--line);text-align:left}
-  .cm[hidden]{display:none}
-  .cm-tg-row{margin-top:22px;display:flex;justify-content:center}
+  .cm{text-align:left;overflow:hidden;max-height:0;opacity:0;transform:translateY(-6px);transition:max-height .55s cubic-bezier(.25,.8,.3,1),opacity .45s ease,transform .55s cubic-bezier(.25,.8,.3,1)}
+  .cm.open{opacity:1;transform:none}
+  .cm-in{margin-top:12px;padding-top:16px;border-top:1px solid var(--line)}
+  .cm-tg-row{margin-top:20px;display:flex;justify-content:flex-end}
   .cm-tg{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
   .cm-tg:hover,.cm-tg.on{border-color:var(--yellow);color:var(--dark);background:#fffbea}
   .cm-tg .n{color:var(--green)}
@@ -65,7 +72,7 @@
   .cm-send:disabled{opacity:.5;cursor:default}
   .cm-st{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px}
   @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}}
-  @media (prefers-reduced-motion:reduce){.ex-box{animation:none}.daisy-fp{display:none}}
+  @media (prefers-reduced-motion:reduce){.ex-ov,.ex-box,.ex-box>*{animation:none!important}.daisy-fp{display:none}.cm{transition:none!important}}
 </style>
 </head>
 <body>
@@ -197,7 +204,7 @@ function daisyClick(){
     if(t<1)requestAnimationFrame(frame);else linger();
   }
   function linger(){
-    var l0=performance.now(), LDUR=1000, FADE=380;
+    var l0=performance.now(), LDUR=1300, FADE=700, shown=false;
     function lf(now){
       var lt=Math.min(1,(now-l0)/LDUR);
       var breathe=1+Math.sin(lt*Math.PI*2)*0.018, bob=Math.sin(lt*Math.PI*2)*3.5, sway=Math.sin(lt*Math.PI*2+1)*2.5;
@@ -207,8 +214,9 @@ function daisyClick(){
       fly.style.transform='rotate('+(540+sway)+'deg)';
       var fs=(LDUR-FADE)/LDUR;
       fly.style.opacity=lt<fs?'1':String(Math.max(0,1-(lt-fs)/(1-fs)));
+      if(!shown&&lt>=fs){shown=true;dim.remove();paintPetals();showExcerpt();}   /* 꽃이 사라지기 시작할 때 문장이 그 자리에서 천천히 떠오른다 */
       if(lt<1)requestAnimationFrame(lf);
-      else{fly.remove();dim.remove();paintPetals();showExcerpt();daisyAnimating=false;}
+      else{fly.remove();daisyAnimating=false;}
     }
     requestAnimationFrame(lf);
   }
@@ -229,12 +237,12 @@ function showExcerpt(){
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
     +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
     +'<div class="cm-tg-row"><button type="button" class="cm-tg" id="cmTg" onclick="cmToggle()" aria-expanded="false" aria-controls="cmSec">댓글<span class="n" id="cmN"></span></button></div>'
-    +'<section class="cm" id="cmSec" aria-label="댓글" hidden>'
+    +'<section class="cm" id="cmSec" aria-label="댓글" aria-hidden="true" inert><div class="cm-in">'
     +'<div class="cm-list" id="cmList"></div>'
     +'<div class="cm-form"><textarea id="cmBody" maxlength="1000"></textarea>'
     +'<div class="cm-row"><input id="cmName" maxlength="30" placeholder="이름 (선택)" value="'+esc(store('dz_name')||'')+'">'
     +'<button type="button" class="cm-send" id="cmSend" onclick="cmPost()">남기기</button></div>'
-    +'<div class="cm-st" id="cmSt"></div></div></section>'
+    +'<div class="cm-st" id="cmSt"></div></div></div></section>'
     +'<button type="button" class="ex-next" onclick="closeExcerpt();daisyClick()" title="한 송이 더" aria-label="한 송이 더">'+fallenDaisySVG()+'</button>'
     +'</div>';
   document.body.appendChild(ov);
@@ -242,12 +250,25 @@ function showExcerpt(){
   cmLoad(it);
 }
 /* 댓글은 «댓글» 단추를 눌러야 열린다 (처음엔 문장과 데이지만) */
+/* 미끄러지듯 펼치기/접기: 실제 높이까지 max-height 를 늘렸다가, 다 열리면 제한을 푼다 */
 function cmToggle(){
   var sec=document.getElementById('cmSec'),tg=document.getElementById('cmTg');if(!sec||!tg)return;
-  var open=sec.hasAttribute('hidden');
-  if(open)sec.removeAttribute('hidden');else sec.setAttribute('hidden','');
+  var open=!sec.classList.contains('open');
+  clearTimeout(sec.__t);
+  if(open){
+    sec.removeAttribute('inert');sec.setAttribute('aria-hidden','false');
+    sec.style.maxHeight=sec.scrollHeight+'px';sec.classList.add('open');
+    sec.__t=setTimeout(function(){if(sec.classList.contains('open'))sec.style.maxHeight='none';},600);
+    var box=sec.closest('.ex-box');
+    setTimeout(function(){var b=document.getElementById('cmBody');if(b&&window.matchMedia&&matchMedia('(hover:hover)').matches)b.focus({preventScroll:true});   /* 휴대폰은 키보드가 바로 올라오지 않게 */
+      
+      if(box&&box.scrollHeight>box.clientHeight)box.scrollTo({top:box.scrollHeight,behavior:'smooth'});},380);
+  }else{
+    sec.style.maxHeight=sec.scrollHeight+'px';sec.offsetHeight;   /* 지금 높이에서 출발 */
+    sec.classList.remove('open');sec.style.maxHeight='0px';
+    sec.setAttribute('inert','');sec.setAttribute('aria-hidden','true');
+  }
   tg.classList.toggle('on',open);tg.setAttribute('aria-expanded',open?'true':'false');
-  if(open)setTimeout(function(){var b=document.getElementById('cmBody');if(b)b.focus({preventScroll:true});sec.scrollIntoView({block:'nearest',behavior:'smooth'});},30);
 }
 function cmCount(n){var e=document.getElementById('cmN');if(e)e.textContent=n?' '+n:'';}
 /* 다음 문장 단추: 심플한 데이지 한 송이 (흰 꽃잎 8장 + 노란 가운데) */
