@@ -34,9 +34,9 @@
   .ex-close:hover{color:var(--dark)}
   .ex-quote{font-size:clamp(16px,2.4vw,20px);line-height:1.85;color:var(--dark);font-family:'Gowun Dodum',sans-serif;word-break:keep-all;white-space:pre-line}
   .ex-src{margin-top:18px;font-size:14px;color:var(--muted)}
-  .ex-next{display:block;margin:20px auto 0;border:none;background:none;padding:4px;cursor:pointer;width:150px;height:80px;transition:transform .25s ease;opacity:.92}
+  .ex-next{display:block;margin:20px auto 0;border:none;background:none;padding:4px;cursor:pointer;width:76px;height:76px;transition:transform .25s ease;opacity:.92}
   .ex-next svg{width:100%;height:100%;display:block}
-  .ex-next:hover{transform:rotate(-6deg) translateY(-2px);opacity:1}
+  .ex-next:hover{transform:rotate(-12deg) scale(1.06);opacity:1}
   .ex-next:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:10px}
   .cm{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);text-align:left}
   .cm-h{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px}
@@ -219,7 +219,6 @@ function showExcerpt(){
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
     +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
     +'<section class="cm" aria-label="의견">'
-    +'<div class="cm-h">이 문장에 대한 생각</div>'
     +'<div class="cm-list" id="cmList"><div class="cm-empty">불러오는 중…</div></div>'
     +'<div class="cm-form"><textarea id="cmBody" maxlength="1000"></textarea>'
     +'<div class="cm-row"><input id="cmName" maxlength="30" placeholder="이름 (선택)" value="'+esc(store('dz_name')||'')+'">'
@@ -232,17 +231,11 @@ function showExcerpt(){
   cmLoad(it);
 }
 /* 떨어진 데이지: 줄기째 옆으로 누운 꽃 + 흩어진 꽃잎 두 장 (누르면 한 송이 더) */
+/* 다음 문장 단추: 심플한 데이지 한 송이 (흰 꽃잎 8장 + 노란 가운데) */
 function fallenDaisySVG(){
-  var P='M0 0 C-4.2 -4 -5.4 -15 -2.6 -22.5 C-1.7 -25.2 1.7 -25.2 2.6 -22.5 C5.4 -15 4.2 -4 0 0 Z',s='';
-  for(var i=0;i<8;i++){if(i===2||i===5)continue;s+='<path d="'+P+'" transform="rotate('+(i*45)+')"/>';}
-  return '<svg viewBox="0 0 120 64" aria-hidden="true">'
-    +'<path d="M14 54 C34 50 52 46 70 40" fill="none" stroke="#6f8f5a" stroke-width="2.2" stroke-linecap="round"/>'
-    +'<path d="M36 50 C38 42 46 40 50 42 C46 46 41 49 36 50 Z" fill="#9db886" stroke="#5c7a4a" stroke-width="1"/>'
-    +'<g transform="translate(80 32) rotate(-28) scale(1.18 .74)" fill="#fff" stroke="#333" stroke-width="1.3" stroke-linejoin="round">'+s
-    +'<circle r="7.2" fill="#f5a623"/></g>'
-    +'<g fill="#fff" stroke="#333" stroke-width="1" stroke-linejoin="round">'
-    +'<path d="'+P+'" transform="translate(104 56) rotate(112) scale(.62)"/>'
-    +'<path d="'+P+'" transform="translate(58 58) rotate(-70) scale(.55)"/></g></svg>';
+  var g='';
+  for(var i=0;i<8;i++)g+='<path transform="rotate('+(i*45)+' 50 50)" d="M50 51 C43.5 45 41.5 26 46 14 C47.4 9.6 52.6 9.6 54 14 C58.5 26 56.5 45 50 51 Z" fill="#fff" stroke="#333" stroke-width="1.6" stroke-linejoin="round"/>';
+  return '<svg viewBox="0 0 100 100" aria-hidden="true">'+g+'<circle cx="50" cy="50" r="12" fill="#f5a623" stroke="#333" stroke-width="1.6"/></svg>';
 }
 function exEsc(e){
   if(e.key!=='Escape')return;
