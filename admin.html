@@ -64,6 +64,30 @@
   .pv-phone{border:2px solid #d9d4c8;border-radius:22px;padding:14px 10px;background:#f1efe8}
   .pv-ph{box-sizing:content-box;width:306px;font-size:16px;padding:14px 12px}
   @media (max-width:700px){.pv-pc{width:auto;max-width:556px}}
+  /* 책 */
+  .bk-form{display:flex;gap:14px;align-items:flex-start;margin-top:10px}
+  .bk-cvbox{flex:none;width:78px;height:112px;border-radius:4px;background:#eeebe3;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12);color:#b9b3a6;font-size:11px;text-align:center;line-height:1.4}
+  .bk-cvbox img{width:100%;height:100%;object-fit:cover;display:block}
+  .bk-fields{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+  .bk-fields .row{flex-wrap:nowrap}
+  .bk-fields label.fl{font-size:11.5px;color:var(--muted)}
+  .file-btn{position:relative;overflow:hidden}
+  .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .bk{border-top:1px dashed var(--line);padding:10px 2px;display:flex;gap:12px;align-items:center}
+  .bk:first-child{border-top:none}
+  .bk.on{background:#fffbea;border-radius:10px;padding:10px}
+  .bk-cv{flex:none;width:34px;height:50px;border-radius:3px;object-fit:cover;background:#eeebe3;box-shadow:0 1px 4px rgba(0,0,0,.14)}
+  .bk .q{flex:1;min-width:0}
+  .bk .t{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--dark)}
+  .bk .m{font-size:12px;color:var(--muted);margin-top:2px}
+  .bk .n{border:none;background:none;color:var(--green);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0}
+  .bk .act{flex:none;display:flex;gap:4px}
+  .bk .act button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:4px 9px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--dark)}
+  .bk .act button.del{color:var(--red)}
+  .imp .g{background:var(--cream);font-weight:700;color:var(--dark)}
+  .imp .g .s{font-weight:400}
+  .imp .ex{padding-left:34px}
+  @media (max-width:560px){.bk-form{flex-direction:column}.bk-fields .row{flex-wrap:wrap}}
   details summary{cursor:pointer;color:var(--muted);font-size:13px}
   .help{font-size:12.5px;color:var(--muted);line-height:1.75;margin-top:8px}
   .help code{background:var(--cream);padding:1px 5px;border-radius:4px}
@@ -90,22 +114,45 @@
       토큰은 이 브라우저에만 저장되고 데이지 화면이나 저장소에는 올라가지 않습니다.</div></details>
   </div>
 
+  <div class="card" id="bkCard">
+    <h2>책 <span class="more" id="bkCnt"></span></h2>
+    <div class="row">
+      <input id="bIsbn" class="in" inputmode="numeric" style="flex:1;min-width:180px" placeholder="ISBN (예: 9788934972464) · 넣고 엔터" onkeydown="if(event.key==='Enter'){event.preventDefault();bkLookup();}">
+      <button class="btn ghost" onclick="bkLookup()">ISBN 조회</button>
+      <button class="btn ghost" style="padding:8px 10px" title="알라딘 API 키 (한국 도서 정확 조회 · HMD 와 같은 키를 함께 씁니다)" onclick="setAladinKey()">⚙</button>
+      <button class="btn ghost" onclick="hmdLocal()" title="이 브라우저에 있는 HMD 독서 목록에서 고르기">HMD 책장에서 고르기</button>
+    </div>
+    <div class="st" id="bkSt"></div>
+    <div class="bk-form">
+      <div class="bk-cvbox" id="bCvBox">표지</div>
+      <div class="bk-fields">
+        <div class="row"><input id="bTitle" class="in" style="flex:2" placeholder="책 제목"><input id="bAuthor" class="in" style="flex:1.2" placeholder="저자"></div>
+        <div class="row"><input id="bPub" class="in" style="flex:1" placeholder="출판사"><input id="bYear" class="in" inputmode="numeric" style="width:96px" placeholder="출판년도"></div>
+        <div class="row"><input id="bCover" class="in" style="flex:1" placeholder="표지 이미지 주소 (ISBN 조회로 채워짐)" oninput="bkCvPaint()">
+          <span class="btn ghost file-btn" title="표지 사진 파일 올리기">사진<input type="file" accept="image/*" onchange="bkCvFile(this)"></span></div>
+        <div class="row"><button class="btn" id="bSave" onclick="bkSave()">＋ 책 등록</button><button class="btn ghost" id="bCancel" style="display:none" onclick="bkClear()">취소</button><button class="btn ghost" onclick="bkClear()" id="bClr">비우기</button></div>
+      </div>
+    </div>
+    <div id="bkList" style="margin-top:12px"></div>
+  </div>
+
   <div class="card">
     <h2>문장 추가</h2>
     <textarea id="nText" class="in qed" placeholder="발췌 문장" oninput="pvSync('nText','')"></textarea>
     <div id="pvNew"></div>
     <div class="row" style="margin-top:8px">
-      <input id="nBook" class="in" list="bookList" style="flex:1.3;min-width:130px" placeholder="책 제목">
-      <input id="nAuthor" class="in" list="authorList" style="flex:1;min-width:110px" placeholder="저자">
+      <select id="nBook" class="in" style="flex:1;min-width:180px" onchange="bkSelChange(this)"></select>
       <input id="nPage" class="in" style="width:80px" placeholder="쪽">
       <button class="btn" onclick="addItem()">＋ 추가</button>
     </div>
-    <datalist id="bookList"></datalist><datalist id="authorList"></datalist>
   </div>
 
-  <div class="card">
+  <div class="card" id="listCard">
     <h2>문장 목록 <span class="more" id="cnt"></span></h2>
-    <input id="q" class="in" style="width:100%;margin-bottom:6px" placeholder="찾기 (문장 · 책 · 저자)" oninput="render()">
+    <div class="row" style="margin-bottom:6px;flex-wrap:nowrap">
+      <input id="q" class="in" style="flex:1" placeholder="찾기 (문장 · 책 · 저자)" oninput="render()">
+      <select id="fBook" class="in" style="max-width:42%" onchange="render()"></select>
+    </div>
     <div id="list"><div class="empty">불러오는 중…</div></div>
   </div>
 
@@ -120,16 +167,17 @@
     <div id="cmList"></div>
   </div>
 
-  <div class="card">
-    <h2>HMD에서 가져오기</h2>
-    <div class="help" style="margin-top:0">HMD <b>설정 → 전체 데이터 백업 → 전체 데이터 받기</b>로 받은 파일(HMD_전체백업_….json)을 고르면, 독서 발췌가 목록으로 나옵니다. 고른 것만 추가됩니다.</div>
-    <div class="row" style="margin-top:8px"><input type="file" id="hmdFile" accept=".json,application/json" onchange="hmdPick(this)"></div>
+  <div class="card" id="impCard">
+    <h2 id="impH">HMD에서 가져오기</h2>
+    <div class="help" style="margin-top:0">HMD 를 쓰는 이 브라우저라면 <b>«이 브라우저의 HMD에서 불러오기»</b>로 바로 책과 발췌가 나옵니다. 다른 기기라면 HMD <b>설정 → 전체 데이터 백업 → 전체 데이터 받기</b>로 받은 파일(HMD_전체백업_….json)을 고르세요.<br>책에 체크하면 책만, 발췌에 체크하면 책과 함께 그 문장이 들어옵니다. (HMD 데이터는 읽기만 하고 바꾸지 않습니다)</div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" onclick="hmdLocal()">이 브라우저의 HMD에서 불러오기</button><input type="file" id="hmdFile" accept=".json,application/json" onchange="hmdPick(this)"></div>
     <div id="impBox"></div>
   </div>
 </div>
 
 <script>
-var DATA={title:'데이지',items:[]}, SHA=null, DIRTY=false, EDIT=null, IMP=[], CMS=[];
+/* excerpts.json = { title, books:[{id,title,author,publisher,year,isbn,cover}], items:[{id,text,bookId,page,added}] } */
+var DATA={title:'데이지',books:[],items:[]}, SHA=null, DIRTY=false, EDIT=null, IMP=[], CMS=[], BEDIT=null, COVER_CACHE={};
 var SUPA_URL='https://qjedpvzqpheggfyupkof.supabase.co', SUPA_KEY='sb_publishable_XzarJNgIdymB3HShYoPvnA_qe_ige_l';
 function sbH(extra){return Object.assign({apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'},extra||{});}
 function $(id){return document.getElementById(id);}
@@ -139,6 +187,7 @@ function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()
 function st(id,t,cls){var e=$(id);if(e){e.textContent=t||'';e.className='st'+(cls?' '+cls:'');}}
 function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
 function b64dec(s){return decodeURIComponent(escape(atob(String(s).replace(/\s/g,''))));}
+function normT(s){return String(s||'').replace(/\s+/g,'').toLowerCase();}
 
 /* 저장소 주소: 비어 있으면 지금 주소(…github.io/저장소/)에서 짐작 */
 function guessRepo(){
@@ -147,7 +196,7 @@ function guessRepo(){
 }
 function repo(){return ($('repo').value||'').trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/$/,'');}
 function tok(){return ($('tok').value||'').trim();}
-function apiUrl(){return 'https://api.github.com/repos/'+repo()+'/contents/excerpts.json';}
+function apiUrl(path){return 'https://api.github.com/repos/'+repo()+'/contents/'+(path||'excerpts.json');}
 function hdr(){var h={'Accept':'application/vnd.github+json'};if(tok())h.Authorization='Bearer '+tok();return h;}
 
 function saveCfg(){ls('dz_repo',repo());ls('dz_tok',tok()||null);load();}
@@ -161,19 +210,53 @@ function load(){
   return p.then(function(j){
     DATA=Array.isArray(j)?{title:'데이지',items:j}:(j||{});if(!Array.isArray(DATA.items))DATA.items=[];
     DATA.items.forEach(function(x,i){if(x.id==null)x.id=i+1;});
-    DIRTY=false;EDIT=null;render();
-    st('cfgSt',tok()?'연결됨 · 고친 뒤 «게시하기»를 누르면 저장됩니다':'읽기 전용 · 토큰을 넣어야 게시할 수 있습니다',tok()?'ok':'');
+    var mig=normalize();
+    DIRTY=mig>0;EDIT=null;renderAll();
+    st('cfgSt',(mig?'예전 문장 '+mig+'개의 책 정보를 «책» 목록으로 옮겼습니다 · 게시하면 저장됩니다. ':'')+(tok()?'연결됨 · 고친 뒤 «게시하기»를 누르면 저장됩니다':'읽기 전용 · 토큰을 넣어야 게시할 수 있습니다'),tok()?'ok':'');
   }).catch(function(e){st('cfgSt',e.message,'err');$('list').innerHTML='<div class="empty">'+esc(e.message)+'</div>';});
 }
-
+/* 예전 형식(문장마다 book·author)을 책 목록 + bookId 로 옮긴다 */
+function normalize(){
+  if(!Array.isArray(DATA.books))DATA.books=[];
+  DATA.books.forEach(function(b){if(b.id==null)b.id=nextBookId();});
+  var n=0;
+  DATA.items.forEach(function(x){
+    if(x.bookId!=null&&bookById(x.bookId)){delete x.book;delete x.author;return;}
+    if(x.book||x.author){
+      var b=findBook(x.book,x.author)||addBookObj({title:x.book||'',author:x.author||''});
+      x.bookId=b.id;delete x.book;delete x.author;n++;
+    }else delete x.bookId;
+  });
+  return n;
+}
 function nextId(){return DATA.items.reduce(function(m,x){return Math.max(m,Number(x.id)||0);},0)+1;}
+function nextBookId(){return (DATA.books||[]).reduce(function(m,x){return Math.max(m,Number(x.id)||0);},0)+1;}
+function bookById(id){return id==null?null:DATA.books.find(function(b){return String(b.id)===String(id);})||null;}
+function findBook(title,author){
+  var t=normT(title);if(!t)return null;
+  var same=DATA.books.filter(function(b){return normT(b.title)===t;});
+  if(same.length>1&&author){var a=normT(author);var m=same.find(function(b){return normT(b.author)===a;});if(m)return m;}
+  return same[0]||null;
+}
+function addBookObj(o){
+  var b={id:nextBookId(),title:String(o.title||'').trim(),author:String(o.author||'').trim(),publisher:String(o.publisher||'').trim(),
+    year:String(o.year||'').trim(),isbn:String(o.isbn||'').trim(),cover:String(o.cover||'').trim()};
+  DATA.books.push(b);return b;
+}
+function bookOf(x){return bookById(x.bookId);}
+function coverSrc(b){return b&&b.cover?(COVER_CACHE[b.cover]||b.cover):'';}
+function pubStr(b){return b.publisher?b.publisher+(b.year?'('+b.year+')':''):(b.year?'('+b.year+')':'');}
+function bookCount(id){return DATA.items.filter(function(x){return String(x.bookId)===String(id);}).length;}
+function sortedBooks(){return DATA.books.slice().sort(function(a,b){return String(a.title).localeCompare(String(b.title),'ko');});}
+
 function setDirty(){DIRTY=true;paintBar();}
 function paintBar(){
   $('saveBar').classList.toggle('on',DIRTY);
   $('saveBtn').disabled=!tok();
   $('dirtyTxt').textContent=tok()?'바뀐 내용이 있습니다 · 게시해야 데이지에 반영됩니다':'바뀐 내용이 있습니다 · 게시하려면 위 «연결»에 토큰을 넣으세요';
 }
-function srcStr(x){return [x.author,x.book?'〈'+x.book+'〉':'',x.page?'p.'+x.page:''].filter(Boolean).join(' ');}
+function srcStr(x){var b=bookOf(x)||{};return [b.title?'〈'+b.title+'〉':'',b.author,pubStr(b),x.page?'p.'+x.page:''].filter(Boolean).join(' · ');}
+
 /* ---- 줄바꿈 미리보기: 데이지 카드와 같은 글꼴 · 글자 크기 · 줄 너비 ----
    컴퓨터 = 카드 안쪽 556px · 20px / 아이폰(390px 화면) = 306px · 16px */
 function pvSync(taId,suf){
@@ -184,26 +267,42 @@ function pvSync(taId,suf){
   if(ph)ph.textContent=v||'문장을 쓰면 여기에 보입니다';
   [pc,ph].forEach(function(e){if(e)e.classList.toggle('ph',!v);});
 }
+function bookOptions(sel,withNew,firstLabel){
+  return '<option value="">'+esc(firstLabel||'— 책 고르기 —')+'</option>'
+    +sortedBooks().map(function(b){return '<option value="'+b.id+'"'+(String(sel)===String(b.id)?' selected':'')+'>'+esc(b.title||'(제목 없음)')+(b.author?' · '+esc(b.author):'')+'</option>';}).join('')
+    +(withNew?'<option value="__new">＋ 새 책 등록…</option>':'');
+}
+function bkSelChange(el){
+  if(el.value==='__new'){el.value='';$('bkCard').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$('bIsbn').focus();},350);return;}
+  if(el.id==='nBook')ls('dz_lastbook',el.value);
+}
+function renderAll(){renderBooks();renderSelects();render();}
+function renderSelects(){
+  var keep=$('nBook').value||ls('dz_lastbook');
+  $('nBook').innerHTML=bookOptions(keep,true);
+  if(!bookById(keep))$('nBook').value='';
+  var f=$('fBook').value;
+  $('fBook').innerHTML=bookOptions(f,false,'모든 책');
+  if(f&&!bookById(f))$('fBook').value='';
+}
 function render(){
-  var q=($('q').value||'').trim().toLowerCase();
-  var list=DATA.items.slice().reverse().filter(function(x){return !q||(x.text+' '+(x.book||'')+' '+(x.author||'')).toLowerCase().indexOf(q)>=0;});
-  $('cnt').textContent=DATA.items.length+'개';
-  var books={},authors={};DATA.items.forEach(function(x){if(x.book)books[x.book]=1;if(x.author)authors[x.author]=1;});
-  $('bookList').innerHTML=Object.keys(books).map(function(b){return '<option value="'+esc(b)+'">';}).join('');
-  $('authorList').innerHTML=Object.keys(authors).map(function(b){return '<option value="'+esc(b)+'">';}).join('');
-  if(!list.length){$('list').innerHTML='<div class="empty">'+(q?'찾는 문장이 없습니다.':'아직 문장이 없습니다. 위에서 추가하세요.')+'</div>';paintBar();return;}
+  var q=($('q').value||'').trim().toLowerCase(),fb=$('fBook').value;
+  var list=DATA.items.slice().reverse().filter(function(x){
+    if(fb&&String(x.bookId)!==fb)return false;
+    var b=bookOf(x)||{};return !q||(x.text+' '+(b.title||'')+' '+(b.author||'')).toLowerCase().indexOf(q)>=0;});
+  $('cnt').textContent=(fb||q?list.length+' / ':'')+DATA.items.length+'개';
+  if(!list.length){$('list').innerHTML='<div class="empty">'+(q||fb?'찾는 문장이 없습니다.':'아직 문장이 없습니다. 위에서 추가하세요.')+'</div>';paintBar();return;}
   $('list').innerHTML=list.map(function(x){
     if(EDIT===x.id)return '<div class="it edit"><div class="q">'
       +'<textarea class="in qed" id="eText" oninput="pvSync(\'eText\',\'E\')">'+esc(x.text)+'</textarea>'
       +'<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span></div>'
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPcE"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPhE"></div></div></div></div></div>'
-      +'<div class="row" style="margin-top:6px"><input id="eBook" class="in" list="bookList" style="flex:1.3" value="'+esc(x.book||'')+'" placeholder="책 제목">'
-      +'<input id="eAuthor" class="in" list="authorList" style="flex:1" value="'+esc(x.author||'')+'" placeholder="저자">'
+      +'<div class="row" style="margin-top:6px"><select id="eBook" class="in" style="flex:1;min-width:160px" onchange="bkSelChange(this)">'+bookOptions(x.bookId,true)+'</select>'
       +'<input id="ePage" class="in" style="width:80px" value="'+esc(x.page||'')+'" placeholder="쪽">'
       +'<button class="btn" onclick="editSave('+x.id+')">확인</button><button class="btn ghost" onclick="EDIT=null;render()">취소</button></div></div></div>';
     var nc=CMS.filter(function(c){return c.excerpt_id===String(x.id)&&!c.hidden;}).length;
-    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x))+(nc?' · <a href="#cmCard" style="color:var(--green)">의견 '+nc+'</a>':'')+'</div></div>'
+    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x)||'(책 없음)')+(nc?' · <a href="#cmCard" style="color:var(--green)">의견 '+nc+'</a>':'')+'</div></div>'
       +'<div class="act"><button onclick="EDIT='+x.id+';render()">고치기</button><button class="del" onclick="delItem('+x.id+')">지우기</button></div></div>';
   }).join('');
   paintBar();
@@ -211,32 +310,174 @@ function render(){
 }
 function addItem(){
   var t=$('nText').value.trim();if(!t){alert('문장을 넣으세요.');$('nText').focus();return;}
+  var bid=$('nBook').value;
+  if(!bid&&DATA.books.length&&!confirm('책을 고르지 않았습니다. 책 없이 추가할까요?'))return;
   if(DATA.items.some(function(x){return x.text.trim()===t;})){if(!confirm('같은 문장이 이미 있습니다. 그래도 추가할까요?'))return;}
-  DATA.items.push({id:nextId(),text:t,book:$('nBook').value.trim(),author:$('nAuthor').value.trim(),page:$('nPage').value.trim().replace(/^p\.?\s*/i,''),added:today()});
-  $('nText').value='';$('nPage').value='';pvSync('nText','');setDirty();render();$('nText').focus();
+  var it={id:nextId(),text:t,page:$('nPage').value.trim().replace(/^p\.?\s*/i,''),added:today()};
+  if(bid)it.bookId=Number(bid)||bid;
+  DATA.items.push(it);ls('dz_lastbook',bid);
+  $('nText').value='';$('nPage').value='';pvSync('nText','');setDirty();renderBooks();render();$('nText').focus();
 }
 function editSave(id){
   var x=DATA.items.find(function(a){return a.id===id;});if(!x)return;
   var t=$('eText').value.trim();if(!t){alert('문장이 비었습니다.');return;}
-  x.text=t;x.book=$('eBook').value.trim();x.author=$('eAuthor').value.trim();x.page=$('ePage').value.trim().replace(/^p\.?\s*/i,'');
-  EDIT=null;setDirty();render();
+  x.text=t;var bid=$('eBook').value;if(bid&&bid!=='__new')x.bookId=Number(bid)||bid;else delete x.bookId;
+  x.page=$('ePage').value.trim().replace(/^p\.?\s*/i,'');
+  EDIT=null;setDirty();renderBooks();render();
 }
 function delItem(id){
   var x=DATA.items.find(function(a){return a.id===id;});if(!x)return;
   if(!confirm('이 문장을 지울까요?\n\n'+x.text.slice(0,80)))return;
-  DATA.items=DATA.items.filter(function(a){return a.id!==id;});setDirty();render();
+  DATA.items=DATA.items.filter(function(a){return a.id!==id;});setDirty();renderBooks();render();
+}
+
+/* ---- 책: ISBN 조회 · 직접 입력 · 표지 사진 ---- */
+function renderBooks(){
+  var bs=sortedBooks();
+  $('bkCnt').textContent=bs.length?bs.length+'권':'';
+  $('bkList').innerHTML=bs.length?bs.map(function(b){
+    var n=bookCount(b.id),cv=coverSrc(b);
+    return '<div class="bk'+(BEDIT===b.id?' on':'')+'">'+(cv?'<img class="bk-cv" src="'+esc(cv)+'" alt="" onerror="this.style.visibility=\'hidden\'">':'<span class="bk-cv"></span>')
+      +'<div class="q"><div class="t">'+esc(b.title||'(제목 없음)')+'</div><div class="m">'+esc([b.author,pubStr(b),b.isbn?'ISBN '+b.isbn:''].filter(Boolean).join(' · '))
+      +(n?' · <button class="n" onclick="bkFilter('+b.id+')">문장 '+n+'</button>':' · 문장 0')+'</div></div>'
+      +'<div class="act"><button onclick="bkEdit('+b.id+')">고치기</button><button class="del" onclick="bkDel('+b.id+')">지우기</button></div></div>';
+  }).join(''):'<div class="empty">아직 책이 없습니다. ISBN 으로 찾거나 직접 적어 등록하세요.</div>';
+}
+function bkFilter(id){$('fBook').value=String(id);$('q').value='';render();$('listCard').scrollIntoView({behavior:'smooth',block:'start'});}
+function bkForm(){return {title:$('bTitle').value.trim(),author:$('bAuthor').value.trim(),publisher:$('bPub').value.trim(),year:$('bYear').value.trim().replace(/[^0-9]/g,'').slice(0,4),isbn:$('bIsbn').value.replace(/[^0-9Xx]/g,''),cover:$('bCover').value.trim()};}
+function bkFill(o){
+  if(o.title!=null)$('bTitle').value=o.title;if(o.author!=null)$('bAuthor').value=o.author;
+  if(o.publisher!=null)$('bPub').value=o.publisher;if(o.year!=null)$('bYear').value=o.year;
+  if(o.isbn!=null)$('bIsbn').value=o.isbn;if(o.cover!=null)$('bCover').value=o.cover;bkCvPaint();
+}
+function bkCvPaint(){
+  var v=$('bCover').value.trim(),src=COVER_CACHE[v]||v,box=$('bCvBox');
+  box.innerHTML=src?'<img src="'+esc(src)+'" alt="표지" onerror="this.parentNode.textContent=\'표지를 못 불러옴\'">':'표지';
+}
+function bkClear(){BEDIT=null;bkFill({title:'',author:'',publisher:'',year:'',isbn:'',cover:''});$('bSave').textContent='＋ 책 등록';$('bCancel').style.display='none';$('bClr').style.display='';st('bkSt','');renderBooks();}
+function bkEdit(id){
+  var b=bookById(id);if(!b)return;BEDIT=b.id;
+  bkFill({title:b.title||'',author:b.author||'',publisher:b.publisher||'',year:b.year||'',isbn:b.isbn||'',cover:b.cover||''});
+  $('bSave').textContent='고친 것 저장';$('bCancel').style.display='';$('bClr').style.display='none';
+  st('bkSt','«'+(b.title||'')+'» 고치는 중 · ISBN 조회로 비어 있는 정보를 다시 채울 수도 있습니다');renderBooks();
+  $('bkCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function bkSave(){
+  var f=bkForm();if(!f.title){alert('책 제목을 넣으세요. (ISBN 조회로 채울 수 있습니다)');$('bTitle').focus();return;}
+  if(BEDIT!=null){var b=bookById(BEDIT);if(b)Object.assign(b,f);st('bkSt','고쳤습니다 · 게시하면 저장됩니다','ok');}
+  else{
+    var dup=findBook(f.title,f.author);
+    if(dup&&normT(dup.author)===normT(f.author)&&!confirm('«'+f.title+'» 이(가) 이미 있습니다. 그래도 새로 등록할까요?'))return;
+    var nb=addBookObj(f);$('nBook').innerHTML=bookOptions(nb.id,true);$('nBook').value=String(nb.id);ls('dz_lastbook',String(nb.id));
+    st('bkSt','등록했습니다 · «문장 추가»에서 이 책이 골라져 있습니다','ok');
+  }
+  setDirty();BEDIT=null;var keep=$('bkSt').textContent;bkClear();st('bkSt',keep,'ok');renderSelects();render();
+}
+function bkDel(id){
+  var b=bookById(id);if(!b)return;var n=bookCount(id);
+  if(!confirm(n?'«'+b.title+'» 과(와) 이 책의 문장 '+n+'개를 함께 지울까요?':'«'+b.title+'» 을(를) 지울까요?'))return;
+  DATA.books=DATA.books.filter(function(x){return x!==b;});
+  DATA.items=DATA.items.filter(function(x){return String(x.bookId)!==String(id);});
+  if(BEDIT===b.id)bkClear();setDirty();renderAll();
+}
+/* 표지 사진: 작게 줄여(가로 최대 400px JPEG) 두었다가 게시할 때 저장소 covers/ 폴더에 올린다 */
+function bkCvFile(inp){
+  var f=inp.files&&inp.files[0];inp.value='';if(!f)return;
+  var rd=new FileReader();rd.onload=function(){
+    var im=new Image();im.onload=function(){
+      var w=Math.min(400,im.naturalWidth),h=Math.round(im.naturalHeight*w/im.naturalWidth);
+      var c=document.createElement('canvas');c.width=w;c.height=h;var g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(im,0,0,w,h);
+      $('bCover').value=c.toDataURL('image/jpeg',.86);bkCvPaint();st('bkSt','표지 사진을 넣었습니다 · 책 등록/저장 후 게시하면 올라갑니다','ok');
+    };im.onerror=function(){alert('이미지를 읽지 못했습니다.');};im.src=rd.result;
+  };rd.readAsDataURL(f);
+}
+/* ISBN → 서지정보 (알라딘 키가 있으면 알라딘 먼저 → 구글북스 → 오픈라이브러리) · HMD 와 같은 방식 */
+function aladinKey(){return ls('aladin_ttb');}
+function setAladinKey(){
+  var k=prompt('알라딘 TTB 키를 입력하세요.\n(www.aladin.co.kr/ttb 에서 무료 발급 · HMD 에 넣은 키가 있으면 이미 들어 있습니다 · 비우면 삭제)',aladinKey());
+  if(k===null)return;k=k.trim();ls('aladin_ttb',k||null);alert(k?'저장했습니다.':'삭제했습니다.');
+}
+function jsonp(url,cb,onerr){
+  var name='__jp'+Math.floor(Math.random()*1e9),sc=document.createElement('script'),done=false;
+  window[name]=function(data){done=true;delete window[name];sc.remove();cb(data);};
+  sc.onerror=function(){sc.remove();if(!done){delete window[name];onerr&&onerr();}};
+  sc.src=url+(url.indexOf('?')>=0?'&':'?')+'callback='+name;document.body.appendChild(sc);
+  setTimeout(function(){if(!done){try{delete window[name];}catch(e){}sc.remove();onerr&&onerr();}},7000);
+}
+/* "알랭 드 보통 (지은이), 정영목 (옮긴이)" → "알랭 드 보통" (옮긴이·감수는 뺀다) */
+function cleanAuthors(a){
+  var parts=String(a||'').split(/,|;/).map(function(x){return x.trim();}).filter(Boolean);
+  var main=parts.filter(function(x){return !/\((옮긴이|감수|번역|역)\)/.test(x);});
+  return (main.length?main:parts).map(function(x){return x.replace(/\([^)]*\)/g,'').replace(/\s+/g,' ').trim();}).filter(Boolean).join(', ');
+}
+function yearOf(s){var m=/(1[5-9]\d\d|20\d\d)/.exec(String(s||''));return m?m[1]:'';}
+function isbnFetch(isbn,done){
+  function tryGoogle(){
+    fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+isbn).then(function(r){return r.json();}).then(function(j){
+      var v=j&&j.totalItems>0&&j.items&&j.items[0]&&j.items[0].volumeInfo;
+      if(v)done({title:v.title||'',author:cleanAuthors((v.authors||[]).join(', ')),publisher:v.publisher||'',year:yearOf(v.publishedDate),
+        cover:((v.imageLinks&&(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail))||'').replace(/^http:/,'https:').replace(/&edge=curl/,''),src:'Google Books'});
+      else tryOpenLib();
+    }).catch(tryOpenLib);
+  }
+  function tryOpenLib(){
+    fetch('https://openlibrary.org/api/books?bibkeys=ISBN:'+isbn+'&format=json&jscmd=data').then(function(r){return r.json();}).then(function(o){
+      var d=o&&o['ISBN:'+isbn];
+      if(d)done({title:d.title||'',author:cleanAuthors((d.authors||[]).map(function(a){return a.name;}).join(', ')),
+        publisher:(d.publishers||[]).map(function(x){return x.name;}).join(', '),year:yearOf(d.publish_date),
+        cover:(d.cover&&(d.cover.large||d.cover.medium))||'',src:'Open Library'});
+      else done(null,'결과 없음 · 한국 도서는 ⚙ 에 알라딘 키를 넣으면 잘 찾습니다');
+    }).catch(function(){done(null,'조회 실패 (네트워크 확인)');});
+  }
+  var key=aladinKey();
+  if(key)jsonp('https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?ttbkey='+encodeURIComponent(key)+'&itemIdType=ISBN13&ItemId='+isbn+'&output=js&Version=20131101',
+    function(d){var it=d&&d.item&&d.item[0];
+      if(it)done({title:String(it.title||'').replace(/\s*\((양장|반양장|무선|특별판|한정판|리커버[^)]*|개정[^)]*)\)\s*$/,''),author:cleanAuthors(it.author),publisher:it.publisher||'',year:yearOf(it.pubDate),
+        cover:String(it.cover||'').replace(/coversum|cover200|cover150|cover100/,'cover500'),src:'알라딘'});
+      else tryGoogle();},tryGoogle);
+  else tryGoogle();
+}
+function bkLookup(){
+  var isbn=$('bIsbn').value.replace(/[^0-9Xx]/g,'');
+  if(isbn.length!==10&&isbn.length!==13){st('bkSt','ISBN 10자리 또는 13자리를 넣으세요','err');$('bIsbn').focus();return;}
+  st('bkSt','조회 중…');
+  isbnFetch(isbn,function(info,err){
+    if(!info){st('bkSt',err,'err');return;}
+    var f=bkForm(),editing=BEDIT!=null;
+    /* 새로 등록할 때는 다 채우고, 고칠 때는 비어 있는 칸만 채운다 */
+    ['title','author','publisher','year','cover'].forEach(function(k){if(info[k]&&(!editing||!f[k]))f[k]=info[k];});
+    f.isbn=isbn;bkFill(f);
+    var dup=!editing&&findBook(f.title,f.author);
+    st('bkSt','찾았습니다 ('+info.src+')'+(dup?' · 같은 제목의 책이 이미 있습니다':' · 확인하고 «책 등록»을 누르세요'),dup?'err':'ok');
+  });
+}
+
+/* ---- 게시: 새 표지 사진을 covers/ 에 올린 뒤 excerpts.json 저장 ---- */
+function putFile(path,b64,msg,sha){
+  var body={message:msg,content:b64,branch:'main'};if(sha)body.sha=sha;
+  return fetch(apiUrl(path),{method:'PUT',headers:Object.assign(hdr(),{'Content-Type':'application/json'}),body:JSON.stringify(body)})
+    .then(function(r){return r.json().then(function(j){return {r:r,j:j};});});
+}
+function uploadCovers(){
+  var pend=DATA.books.filter(function(b){return /^data:image\//.test(b.cover||'');});
+  return pend.reduce(function(p,b){return p.then(function(){
+    var data=b.cover,path='covers/b'+b.id+'-'+Date.now().toString(36)+'.jpg';
+    $('dirtyTxt').textContent='표지 올리는 중… «'+b.title+'»';
+    return putFile(path,data.slice(data.indexOf(',')+1),'표지: '+b.title).then(function(o){
+      if(!o.r.ok)throw new Error('표지를 올리지 못했습니다: '+((o.j&&o.j.message)||o.r.status));
+      COVER_CACHE[path]=data;b.cover=path;
+    });});},Promise.resolve());
 }
 function publish(){
   if(!tok()){alert('위 «연결»에 깃허브 토큰을 넣으세요.');return;}
-  var body={message:'데이지 문장 '+DATA.items.length+'개 ('+today()+')',content:b64enc(JSON.stringify(DATA,null,2)+'\n'),branch:'main'};
-  if(SHA)body.sha=SHA;
   $('saveBtn').disabled=true;$('dirtyTxt').textContent='게시하는 중…';
-  fetch(apiUrl(),{method:'PUT',headers:Object.assign(hdr(),{'Content-Type':'application/json'}),body:JSON.stringify(body)})
-    .then(function(r){return r.json().then(function(j){return {r:r,j:j};});})
-    .then(function(o){
+  uploadCovers().then(function(){
+    var out={title:DATA.title||'데이지',books:DATA.books,items:DATA.items};
+    return putFile('excerpts.json',b64enc(JSON.stringify(out,null,2)+'\n'),'데이지 책 '+DATA.books.length+'권 · 문장 '+DATA.items.length+'개 ('+today()+')',SHA);
+  }).then(function(o){
       if(o.r.status===409||o.r.status===422&&/sha/i.test(o.j.message||'')){throw new Error('다른 곳에서 먼저 바뀌었습니다. «저장 · 불러오기»로 새로 불러온 뒤 다시 해 주세요.');}
       if(!o.r.ok)throw new Error((o.j&&o.j.message)||('오류 '+o.r.status));
-      SHA=o.j.content&&o.j.content.sha;DIRTY=false;paintBar();
+      SHA=o.j.content&&o.j.content.sha;DIRTY=false;paintBar();renderBooks();
       st('cfgSt','게시했습니다 · 1~2분 뒤 데이지에 반영됩니다','ok');
     }).catch(function(e){$('saveBtn').disabled=false;paintBar();alert('게시하지 못했습니다.\n\n'+e.message);});
 }
@@ -278,8 +519,30 @@ function cmHide(id,hide){
     .then(function(ok){if(!ok)throw new Error('비밀번호가 맞지 않습니다');var c=CMS.find(function(x){return x.id===id;});if(c)c.hidden=hide;cmRender();render();})
     .catch(function(e){alert('바꾸지 못했습니다: '+e.message);});
 }
-/* ---- HMD 전체 백업 파일 → 독서 발췌 골라 담기 ---- */
+
+/* ---- HMD 독서 → 책 · 발췌 골라 담기 ----
+   HMD 와 데이지는 같은 주소(copakiguy-bot.github.io)라 이 브라우저의 HMD 데이터를 바로 읽을 수 있다 (읽기만) */
 function plain(h){var d=document.createElement('div');d.innerHTML=String(h||'').replace(/<br\s*\/?>/gi,'\n').replace(/<\/(p|div|li)>/gi,'\n');return (d.textContent||'').replace(/\n{3,}/g,'\n\n').trim();}
+function hmdReadLocal(){
+  return new Promise(function(res){
+    var fromLS=function(){try{res(JSON.parse(localStorage.getItem('dailypage_v7')||'null'));}catch(e){res(null);}};
+    if(ls('hmd_mainIdb')!=='1'||!window.indexedDB)return fromLS();
+    try{var r=indexedDB.open('hmd_store',1);
+      r.onupgradeneeded=function(){try{r.result.createObjectStore('kv');}catch(e){}};
+      r.onsuccess=function(){try{var q=r.result.transaction('kv','readonly').objectStore('kv').get('main');
+        q.onsuccess=function(){try{res(q.result?JSON.parse(q.result):null);}catch(e){fromLS();}};q.onerror=fromLS;}catch(e){fromLS();}};
+      r.onerror=fromLS;
+    }catch(e){fromLS();}
+  });
+}
+function hmdLocal(){
+  $('impCard').scrollIntoView({behavior:'smooth',block:'start'});
+  $('impBox').innerHTML='<div class="st">HMD 데이터를 읽는 중…</div>';
+  hmdReadLocal().then(function(d){
+    if(!d||!Array.isArray(d.reading)){$('impBox').innerHTML='<div class="st err">이 브라우저에는 HMD 데이터가 없습니다. HMD 를 쓰는 브라우저에서 열거나, 아래 파일 고르기로 백업 파일을 넣으세요.</div>';return;}
+    impShow(d);
+  });
+}
 function hmdPick(inp){
   var f=inp.files&&inp.files[0];if(!f)return;
   var rd=new FileReader();
@@ -287,27 +550,64 @@ function hmdPick(inp){
     var j=null;try{j=JSON.parse(rd.result);}catch(e){}
     var d=j&&j.data?j.data:j;
     if(!d||!Array.isArray(d.reading)){$('impBox').innerHTML='<div class="st err">HMD 전체 백업 파일이 아닙니다.</div>';return;}
-    IMP=[];d.reading.forEach(function(b){(b.excerpts||[]).forEach(function(e){var t=plain(e.text);if(t)IMP.push({text:t,book:b.title||'',author:String(b.author||'').split('/')[0].trim(),page:String(e.page||'').trim()});});});
-    var have={};DATA.items.forEach(function(x){have[x.text.trim()]=1;});
-    $('impBox').innerHTML=IMP.length?('<div class="row" style="margin-top:10px"><span class="st" style="margin:0">발췌 '+IMP.length+'개 · 이미 있는 문장은 흐리게</span>'
-      +'<button class="btn" style="margin-left:auto" onclick="impAdd()">고른 것 추가</button></div>'
-      +'<div class="imp">'+IMP.map(function(x,i){var dup=have[x.text];return '<label class="'+(dup?'dup':'')+'"><input type="checkbox" data-i="'+i+'"'+(dup?' disabled':'')+'><div><div class="t">'+esc(x.text)+'</div><div class="s">'+esc(srcStr(x))+'</div></div></label>';}).join('')+'</div>')
-      :'<div class="st">이 파일에는 독서 발췌가 없습니다.</div>';
+    impShow(d);
   };
   rd.readAsText(f);inp.value='';
 }
+function impShow(d){
+  IMP=[];
+  d.reading.forEach(function(b){
+    if(!b||!String(b.title||'').trim())return;
+    var g={b:{title:String(b.title).trim(),author:cleanAuthors(String(b.author||'').split('/')[0]),publisher:b.publisher||'',year:b.year||'',isbn:String(b.isbn||'').replace(/[^0-9Xx]/g,''),cover:/^https?:/.test(b.cover||'')?b.cover:''},ex:[]};
+    (b.excerpts||[]).forEach(function(e){var t=plain(e.text);if(t)g.ex.push({text:t,page:String(e.page||'').trim().replace(/^p\.?\s*/i,'')});});
+    IMP.push(g);
+  });
+  IMP.sort(function(a,b){return b.ex.length-a.ex.length||a.b.title.localeCompare(b.b.title,'ko');});
+  var have={};DATA.items.forEach(function(x){have[x.text.trim()]=1;});
+  var nEx=IMP.reduce(function(s,g){return s+g.ex.length;},0);
+  if(!IMP.length){$('impBox').innerHTML='<div class="st">HMD 독서 목록이 비어 있습니다.</div>';return;}
+  $('impBox').innerHTML='<div class="row" style="margin-top:10px"><span class="st" style="margin:0">책 '+IMP.length+'권 · 발췌 '+nEx+'개 · 이미 있는 것은 흐리게</span>'
+    +'<button class="btn" style="margin-left:auto" onclick="impAdd()">고른 것 추가</button></div>'
+    +'<div class="imp">'+IMP.map(function(g,gi){
+      var bk=findBook(g.b.title,g.b.author);
+      return '<label class="g'+(bk?' dup':'')+'"><input type="checkbox" data-g="'+gi+'"'+(bk?' disabled':'')+' onchange="impGroup(this)"><div><div class="t">'+esc(g.b.title)+'</div><div class="s">'+esc([g.b.author,g.b.publisher,g.b.isbn?'ISBN '+g.b.isbn:'',g.ex.length?'발췌 '+g.ex.length:'발췌 없음',bk?'이미 등록된 책':''].filter(Boolean).join(' · '))+'</div></div></label>'
+        +g.ex.map(function(x,i){var dup=have[x.text];return '<label class="ex'+(dup?' dup':'')+'"><input type="checkbox" data-g="'+gi+'" data-i="'+i+'"'+(dup?' disabled':'')+'><div><div class="t">'+esc(x.text)+'</div>'+(x.page?'<div class="s">p.'+esc(x.page)+'</div>':'')+'</div></label>';}).join('');
+    }).join('')+'</div>';
+}
+/* 책에 체크하면 그 책의 (아직 없는) 발췌도 함께 체크 · 다시 풀면 함께 풀림 */
+function impGroup(cb){
+  var g=cb.getAttribute('data-g');
+  document.querySelectorAll('#impBox input[data-i][data-g="'+g+'"]').forEach(function(c){if(!c.disabled)c.checked=cb.checked;});
+}
 function impAdd(){
-  var n=0;document.querySelectorAll('#impBox input[type=checkbox]:checked').forEach(function(c){var x=IMP[+c.getAttribute('data-i')];if(!x)return;
-    DATA.items.push({id:nextId(),text:x.text,book:x.book,author:x.author,page:x.page,added:today()});n++;});
-  if(!n){alert('추가할 문장을 고르세요.');return;}
-  $('impBox').innerHTML='<div class="st ok">'+n+'개를 추가했습니다 · 위 «게시하기»를 눌러 저장하세요</div>';
-  setDirty();render();
+  var nb=0,ne=0,fresh=[];
+  IMP.forEach(function(g,gi){
+    var bookCb=document.querySelector('#impBox input[data-g="'+gi+'"]:not([data-i])');
+    var exs=[].slice.call(document.querySelectorAll('#impBox input[data-i][data-g="'+gi+'"]:checked'));
+    if(!(bookCb&&bookCb.checked)&&!exs.length)return;
+    var b=findBook(g.b.title,g.b.author);
+    if(!b){b=addBookObj(g.b);nb++;fresh.push(b);}
+    exs.forEach(function(c){var x=g.ex[+c.getAttribute('data-i')];if(!x)return;
+      DATA.items.push({id:nextId(),text:x.text,bookId:b.id,page:x.page,added:today()});ne++;});
+  });
+  if(!nb&&!ne){alert('추가할 책이나 문장을 고르세요.');return;}
+  $('impBox').innerHTML='<div class="st ok">책 '+nb+'권 · 문장 '+ne+'개를 추가했습니다 · 위 «게시하기»를 눌러 저장하세요</div>';
+  setDirty();renderAll();
+  /* HMD 에는 출판년도가 없으니, ISBN 이 있는 새 책은 조회해서 출판년도(와 빠진 표지·출판사)를 채운다 */
+  var need=fresh.filter(function(b){return b.isbn&&(!b.year||!b.cover||!b.publisher);});
+  if(!need.length)return;
+  var left=need.length;st('bkSt','새 책 '+left+'권의 출판년도를 ISBN 으로 찾는 중…');
+  need.forEach(function(b,i){setTimeout(function(){isbnFetch(b.isbn,function(info){
+    if(info){if(!b.year)b.year=info.year||'';if(!b.cover)b.cover=info.cover||'';if(!b.publisher)b.publisher=info.publisher||'';}
+    if(--left===0){st('bkSt','출판년도를 채웠습니다 · 비어 있는 책은 «고치기»로 직접 넣으세요','ok');renderAll();}
+  });},i*350);});
 }
 
 $('pvNew').innerHTML='<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span></div>'
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPc"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPh"></div></div></div></div></div>';pvSync('nText','');
 $('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');$('adm').value=ls('dz_adm');
+renderSelects();
 load().then(function(){cmLoad();});
 </script>
 </body>

@@ -23,8 +23,29 @@
   .flower:hover{transform:rotate(-8deg) scale(1.04)}
   .flower:active{transform:scale(.96)}
   .flower svg{width:100%;height:100%;display:block}
-  .hint{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--muted)}
   .msg{font-size:13px;color:var(--muted);min-height:18px}
+  /* 책 목록: HMD 맨 위 일정처럼 손잡이를 누르면 스르륵 열린다 */
+  .shelf{display:flex;flex-direction:column;align-items:center;width:min(340px,86vw)}
+  .sh-handle{border:none;background:none;padding:10px 0 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;font-family:inherit}
+  .sh-bar{display:block;width:120px;height:4px;border-radius:4px;background:#d9d5cc;transition:background .13s,width .25s,transform .13s}
+  .sh-handle:hover .sh-bar{background:#bfc7c2;transform:scaleY(1.5)}
+  .shelf.open .sh-bar{width:190px;background:var(--line)}
+  .sh-cur{font-family:'Gowun Dodum',sans-serif;font-size:13.5px;color:var(--muted);min-height:18px;transition:opacity .25s}
+  .shelf.open .sh-cur{opacity:0}
+  .sh-clip{overflow:hidden;max-height:0;opacity:0;width:100%;transition:max-height .42s cubic-bezier(.4,0,.2,1),opacity .3s ease}
+  .shelf.open .sh-clip{opacity:1}
+  .sh-list{list-style:none;margin:0;padding:4px 0 8px;display:flex;flex-direction:column;gap:2px;max-height:min(46vh,420px);overflow:auto;transform:translateY(-10px);transition:transform .42s cubic-bezier(.4,0,.2,1)}
+  .shelf.open .sh-list{transform:none}
+  .sh-it{display:flex;align-items:center;gap:11px;width:100%;border:none;background:none;border-radius:11px;padding:7px 10px;cursor:pointer;text-align:left;font-family:inherit;color:var(--text)}
+  .sh-it:hover{background:rgba(255,255,255,.6)}
+  .sh-it.on{background:#fff;box-shadow:0 2px 10px rgba(18,49,43,.06)}
+  .sh-cv{flex:none;width:26px;height:38px;border-radius:2px;object-fit:cover;background:#e6e2d8;box-shadow:0 1px 4px rgba(0,0,0,.14)}
+  .sh-all{display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:none;background:none}
+  .sh-t{flex:1;min-width:0}
+  .sh-t b{display:block;font-family:'Gowun Dodum',sans-serif;font-weight:400;font-size:15px;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sh-t span{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sh-n{flex:none;font-size:12px;color:var(--muted)}
+  .sh-it.on .sh-n{color:var(--green);font-weight:700}
   /* 날아오는 꽃 · 떨어지는 꽃잎 */
   .daisy-dim{position:fixed;inset:0;background:rgba(18,49,43,.34);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:118}
   .daisy-fly{position:fixed;z-index:119;pointer-events:none;line-height:0;filter:drop-shadow(0 8px 22px rgba(18,49,43,.12));will-change:transform}
@@ -37,7 +58,7 @@
   @keyframes boxIn{0%{opacity:0;transform:translateY(12px) scale(.985)}100%{opacity:1;transform:none}}
   @keyframes txtIn{0%{opacity:0;filter:blur(3px)}100%{opacity:1;filter:blur(0)}}
   .ex-box>.ex-quote{animation:txtIn 1.5s .35s ease-out both}
-  .ex-box>.ex-src{animation:txtIn 1.2s .9s ease-out both}
+  .ex-box>.ex-src,.ex-box>.ex-book{animation:txtIn 1.2s .9s ease-out both}
   .ex-box>.cm-tg-row,.ex-box>.ex-next{animation:txtIn 1s 1.2s ease-out both}
   .ex-box{background:var(--card);border-radius:22px;padding:46px 42px 34px;max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto;text-align:center;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:boxIn 1.1s cubic-bezier(.22,.8,.3,1) both}
   @keyframes expop{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
@@ -45,6 +66,12 @@
   .ex-close:hover{color:var(--dark)}
   .ex-quote{font-size:clamp(16px,2.4vw,20px);line-height:1.85;color:var(--dark);font-family:'Gowun Dodum',sans-serif;word-break:keep-all;white-space:pre-line}
   .ex-src{margin-top:18px;font-size:14px;color:var(--muted)}
+  /* 문장 밑: 책 표지 → 서지정보 */
+  .ex-book{margin:26px 0 0;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .ex-cover{display:block;height:132px;width:auto;max-width:100px;object-fit:cover;border-radius:3px;box-shadow:0 6px 18px rgba(18,49,43,.16),0 1px 3px rgba(0,0,0,.1);background:#eeebe3}
+  .ex-bib{line-height:1.6}
+  .ex-bt{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--dark)}
+  .ex-bm{font-size:12.5px;color:var(--muted);word-break:keep-all}
   .ex-next{display:block;margin:20px auto 0;border:none;background:none;padding:4px;cursor:pointer;width:76px;height:76px;transition:transform .25s ease;opacity:.92}
   .ex-next svg{width:100%;height:100%;display:block}
   .ex-next:hover{transform:rotate(-12deg) scale(1.06);opacity:1}
@@ -53,9 +80,10 @@
   .cm.open{opacity:1;transform:none}
   .cm-in{margin-top:12px;padding-top:16px;border-top:1px solid var(--line)}
   .cm-tg-row{margin-top:20px;display:flex;justify-content:flex-end}
-  .cm-tg{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 15px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+  .cm-tg{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 13px 5px 11px;font-family:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;min-width:52px;justify-content:center}
+  .cm-tg svg{width:15px;height:15px;flex:none}
   .cm-tg:hover,.cm-tg.on{border-color:var(--yellow);color:var(--dark);background:#fffbea}
-  .cm-tg .n{color:var(--green)}
+  .cm-tg .n{font-variant-numeric:tabular-nums}
   .cm-h{font-size:13px;font-weight:700;color:var(--dark);margin-bottom:10px}
   .cm-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
   .cm-list:empty{display:none}
@@ -65,20 +93,26 @@
   .cm-b{font-size:14px;line-height:1.7;color:var(--text);white-space:pre-line;word-break:break-word}
   .cm-empty{font-size:13px;color:var(--muted)}
   .cm-form textarea{width:100%;min-height:72px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:'Gowun Dodum',sans-serif;font-size:15px;line-height:1.6;color:var(--text);background:#fff}
-  .cm-form textarea:focus,.cm-row input:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 2px rgba(244,183,64,.18)}
-  .cm-row{display:flex;gap:8px;margin-top:8px}
-  .cm-row input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-family:inherit;font-size:13px;background:#fff}
-  .cm-send{flex:none;border:none;border-radius:9px;padding:8px 16px;background:var(--yellow);color:#3a2a00;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+  .cm-form textarea:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 2px rgba(244,183,64,.18)}
+  .cm-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+  /* 이름: 밑줄만 있는 작은 칸 (안 써도 됨 · 비우면 «익명») */
+  .cm-name{flex:none;width:104px;min-width:0;border:none;border-bottom:1px dashed #ddd8cc;border-radius:0;padding:4px 2px;font-family:'Gowun Dodum',sans-serif;font-size:13px;color:var(--text);background:transparent}
+  .cm-name::placeholder{color:#bdb8ad}
+  .cm-name:focus{outline:none;border-bottom:1px solid var(--yellow)}
+  .cm-send{flex:none;margin-left:auto;border:none;border-radius:9px;padding:7px 16px;background:var(--yellow);color:#3a2a00;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
   .cm-send:disabled{opacity:.5;cursor:default}
   .cm-st{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px}
-  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}}
+  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-cover{height:112px}.ex-book{margin-top:22px}}
   @media (prefers-reduced-motion:reduce){.ex-ov,.ex-box,.ex-box>*{animation:none!important}.daisy-fp{display:none}.cm{transition:none!important}}
 </style>
 </head>
 <body>
 <main class="stage">
   <button class="flower" id="flowerBtn" type="button" aria-label="데이지 누르기 · 문장 하나 꺼내기" title="눌러서 문장 하나 꺼내기"><svg id="headFlower" viewBox="0 0 100 100" aria-hidden="true"></svg></button>
-  <div class="hint">데이지를 눌러주세요.</div>
+  <div class="shelf" id="shelf">
+    <button type="button" class="sh-handle" id="shHandle" onclick="shelfToggle()" aria-expanded="false" aria-controls="shClip" title="책 고르기"><span class="sh-bar"></span><span class="sh-cur" id="shCur"></span></button>
+    <div class="sh-clip" id="shClip" inert><ul class="sh-list" id="shList"></ul></div>
+  </div>
   <div class="msg" id="msg"></div>
 </main>
 
@@ -92,38 +126,94 @@ var ITEMS=[], LOADED=false, LOAD_ERR='', CUR=null;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
 
+/* excerpts.json = { books:[{id,title,author,publisher,year,cover,isbn}], items:[{id,text,bookId,page}] }
+   (예전 형식: 문장마다 book·author 를 직접 적은 것도 그대로 읽는다) */
+var BOOKS=[], BOOK_BY={}, SCOPE=store('dz_scope')||'all';
 function loadExcerpts(){
   return fetch('excerpts.json?t='+Date.now(),{cache:'no-store'}).then(function(r){
     if(!r.ok)throw new Error(r.status);return r.json();
   }).then(function(j){
     var list=Array.isArray(j)?j:(j&&j.items)||[];
-    ITEMS=list.filter(function(x){return x&&String(x.text||'').trim();});
+    BOOKS=((j&&j.books)||[]).filter(function(b){return b&&b.id!=null;}).map(function(b){var o=Object.assign({},b);o.id=String(b.id);return o;});
+    BOOK_BY={};BOOKS.forEach(function(b){BOOK_BY[b.id]=b;});
+    ITEMS=list.filter(function(x){return x&&String(x.text||'').trim();}).map(function(x,i){
+      var o=Object.assign({},x);o.id=String(x.id!=null?x.id:i);
+      if(o.bookId!=null&&BOOK_BY[String(o.bookId)])o.bookId=String(o.bookId);
+      else if(o.book||o.author){                                   /* 예전 형식 → 제목으로 책을 묶는다 */
+        var k='L:'+(o.book||'')+'|'+(o.author||'');
+        if(!BOOK_BY[k]){BOOK_BY[k]={id:k,title:o.book||'',author:o.author||''};BOOKS.push(BOOK_BY[k]);}
+        o.bookId=k;
+      }else o.bookId='';
+      return o;
+    });
+    BOOKS=BOOKS.filter(function(b){return ITEMS.some(function(x){return x.bookId===b.id;});});   /* 문장이 있는 책만 목록에 */
+    if(SCOPE!=='all'&&!BOOK_BY[SCOPE])SCOPE='all';
     LOADED=true;LOAD_ERR='';msg('');
-  }).catch(function(e){LOADED=true;LOAD_ERR='문장을 불러오지 못했습니다 ('+e.message+')';msg(LOAD_ERR);});
+    shelfRender();syncPetals();buildDaisy(document.getElementById('headFlower'),false);
+  }).catch(function(e){LOADED=true;LOAD_ERR='문장을 불러오지 못했습니다 ('+e.message+')';msg(LOAD_ERR);shelfRender();});
 }
 function msg(t){var m=document.getElementById('msg');if(m)m.textContent=t||'';}
+function bookOf(it){return it&&it.bookId?BOOK_BY[it.bookId]||null:null;}
+function scopeItems(){return SCOPE==='all'?ITEMS:ITEMS.filter(function(x){return x.bookId===SCOPE;});}
 
-/* 같은 문장이 연달아 나오지 않게: 한 바퀴 다 돌 때까지 섞인 순서대로 (이 기기에 기억) */
+/* ---------- 책 목록 (손잡이를 누르면 열림) ---------- */
+function shelfRender(){
+  var cur=document.getElementById('shCur'),ul=document.getElementById('shList');if(!ul)return;
+  var b=SCOPE==='all'?null:BOOK_BY[SCOPE];
+  cur.textContent=b?b.title:(ITEMS.length?'전체':'');
+  var cnt={};ITEMS.forEach(function(x){cnt[x.bookId]=(cnt[x.bookId]||0)+1;});
+  var row=function(id,cv,t,s,n){
+    return '<li><button type="button" class="sh-it'+(SCOPE===id?' on':'')+'" data-id="'+esc(id)+'" onclick="shelfPick(this.getAttribute(\'data-id\'))">'+cv
+      +'<span class="sh-t"><b>'+esc(t)+'</b>'+(s?'<span>'+esc(s)+'</span>':'')+'</span><span class="sh-n">'+n+'</span></button></li>';};
+  var h=row('all','<span class="sh-cv sh-all" aria-hidden="true">🌼</span>','전체',BOOKS.length?'책 '+BOOKS.length+'권':'',ITEMS.length);
+  BOOKS.slice().sort(function(a,b){return String(a.title).localeCompare(String(b.title),'ko');}).forEach(function(bk){
+    var cv=bk.cover?'<img class="sh-cv" src="'+esc(bk.cover)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">':'<span class="sh-cv" aria-hidden="true"></span>';
+    h+=row(bk.id,cv,bk.title||'(제목 없음)',bk.author||'',cnt[bk.id]||0);
+  });
+  ul.innerHTML=h;
+}
+function shelfToggle(force){
+  var sh=document.getElementById('shelf'),clip=document.getElementById('shClip'),hd=document.getElementById('shHandle');
+  var open=force!=null?force:!sh.classList.contains('open');
+  if(open){clip.removeAttribute('inert');clip.style.maxHeight=clip.scrollHeight+'px';}
+  else{clip.style.maxHeight='0px';clip.setAttribute('inert','');}
+  sh.classList.toggle('open',open);hd.setAttribute('aria-expanded',open?'true':'false');
+}
+function shelfPick(id){
+  if(daisyAnimating)return;
+  SCOPE=(id==='all'||BOOK_BY[id])?id:'all';store('dz_scope',SCOPE);
+  shelfRender();syncPetals();buildDaisy(document.getElementById('headFlower'),false);
+  setTimeout(function(){shelfToggle(false);},180);
+}
+
+/* ---------- 고르기: 고른 범위(전체 / 책 하나)의 문장을 한 바퀴 다 볼 때까지 겹치지 않게 ----------
+   꽃잎 8장 = 그 범위의 문장 전체. 본 문장 수 ÷ 전체 × 8 만큼 꽃잎이 진다
+   (예: 문장 100개 → 12.5개마다 한 장 · 다 보면 꽃잎이 모두 지고, 다음에 누르면 새 꽃) */
+function seenKey(){return 'dz_seen_'+SCOPE;}
+function scopeState(){
+  var ids=scopeItems().map(function(x){return x.id;});
+  var seen=(store(seenKey())||[]).filter(function(id){return ids.indexOf(id)>=0;});
+  return {ids:ids,seen:seen};
+}
+function petalsFor(seenN,total){return total?Math.min(DAISY_N,Math.floor(seenN*DAISY_N/total+1e-9)):0;}
+function syncPetals(){var s=scopeState();daisyDropped=daisyOrder.slice(0,petalsFor(s.seen.length,s.ids.length));}
 function pickItem(){
-  if(!ITEMS.length)return null;
-  var ids=ITEMS.map(function(x,i){return String(x.id!=null?x.id:i);});
-  var bag=(store('dz_bag')||[]).filter(function(id){return ids.indexOf(id)>=0;});
+  var s=scopeState();if(!s.ids.length)return null;
+  var fresh=s.seen.length>=s.ids.length;if(fresh)s.seen=[];
+  var pool=s.ids.filter(function(id){return s.seen.indexOf(id)<0;});
   var last=store('dz_last');
-  if(!bag.length){
-    bag=ids.slice();
-    for(var i=bag.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=bag[i];bag[i]=bag[j];bag[j]=t;}
-    if(bag.length>1&&bag[0]===last){bag.push(bag.shift());}
-  }
-  var id=bag.shift();store('dz_bag',bag);store('dz_last',id);
-  return ITEMS[ids.indexOf(id)];
+  if(pool.length>1)pool=pool.filter(function(id){return id!==last;});
+  var id=pool[Math.floor(Math.random()*pool.length)];
+  s.seen.push(id);store(seenKey(),s.seen);store('dz_last',id);
+  var it=ITEMS.find(function(x){return x.id===id;});
+  return {it:it,fresh:fresh,drop:petalsFor(s.seen.length,s.ids.length)};
 }
 
 /* ---------- 데이지 그림 (HMD 와 같은 꽃) ---------- */
 var DAISY_N=8, daisyAnimating=false;
-var daisyDropped=store('dz_dropped')||[];
+var daisyDropped=[];
 var daisyStart=Math.round(60/(360/DAISY_N))%DAISY_N;            // 2시 위치부터
 var daisyOrder=[];for(var _k=0;_k<DAISY_N;_k++)daisyOrder.push(((daisyStart-_k)%DAISY_N+DAISY_N)%DAISY_N);
-function daisyRemaining(){return DAISY_N-daisyDropped.length;}
 function buildDaisy(svg,soft){
   var s='',i,a;
   if(!soft){
@@ -149,13 +239,13 @@ function buildDaisy(svg,soft){
   }
   svg.innerHTML=s;
 }
-function paintPetals(){}
-function daisySpawnFall(x,y){
+function daisySpawnFall(x,y,k,n,size){
   var fp=document.createElement('div');fp.className='daisy-fp';
+  if(n>1){var a=(k/n)*Math.PI*2+Math.random()*.5,r=(size||200)*.24;x+=Math.cos(a)*r;y+=Math.sin(a)*r;fp.style.animationDelay=(k*70)+'ms';}
   fp.style.left=(x-7)+'px';fp.style.top=(y-17)+'px';
   fp.style.setProperty('--dx',(Math.random()*100-50).toFixed(0)+'px');
   fp.style.setProperty('--rot',((Math.random()*180+140)*(Math.random()<.5?-1:1)).toFixed(0)+'deg');
-  document.body.appendChild(fp);setTimeout(function(){fp.remove();},1350);
+  document.body.appendChild(fp);setTimeout(function(){fp.remove();},1350+(k||0)*70);
 }
 
 /* ---------- 누르기: 꽃이 날아올라 꽃잎 하나 지고 → 문장 ---------- */
@@ -163,16 +253,19 @@ function daisyClick(){
   if(daisyAnimating)return;
   if(!LOADED){msg('불러오는 중…');return;}
   if(!ITEMS.length){msg(LOAD_ERR||'아직 등록된 문장이 없습니다.');return;}
+  if(!scopeItems().length){SCOPE='all';store('dz_scope',SCOPE);shelfRender();}
   daisyAnimating=true;
-  closeExcerpt();
-  var wasEmpty=(daisyRemaining()<=0);
-  if(wasEmpty){daisyDropped=[];store('dz_dropped',daisyDropped);}
+  closeExcerpt();shelfToggle(false);
+  syncPetals();
+  var pk=pickItem();if(!pk){daisyAnimating=false;return;}
+  if(pk.fresh)daisyDropped=[];                                   /* 한 바퀴 다 봤으면 새 꽃으로 */
+  var fall=Math.max(0,pk.drop-daisyDropped.length);
   var head=document.getElementById('headFlower');
   buildDaisy(head,false);
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduce){
-    if(!wasEmpty){daisyDropped.push(daisyOrder[daisyDropped.length]);store('dz_dropped',daisyDropped);buildDaisy(head,false);}
-    paintPetals();showExcerpt();daisyAnimating=false;return;
+    daisyDropped=daisyOrder.slice(0,pk.drop);buildDaisy(head,false);
+    showExcerpt(pk.it);daisyAnimating=false;return;
   }
   var dim=document.createElement('div');dim.className='daisy-dim';document.body.appendChild(dim);
   var fly=document.createElement('div');fly.className='daisy-fly';
@@ -195,11 +288,13 @@ function daisyClick(){
     fly.style.width=size+'px';fly.style.height=size+'px';
     fly.style.left=(x-size/2)+'px';fly.style.top=(y-size/2)+'px';
     fly.style.transform='rotate('+(e*540+wob)+'deg)';
-    if(!dropMid&&t>=0.55&&!wasEmpty){
+    if(!dropMid&&t>=0.55){
       dropMid=true;
-      daisyDropped.push(daisyOrder[daisyDropped.length]);store('dz_dropped',daisyDropped);
-      buildDaisy(head,false);buildDaisy(flySvg,true);paintPetals();
-      daisySpawnFall(x,y);
+      if(fall>0){                                                  /* 비율이 넘어갈 때만 꽃잎이 진다 (여러 장일 수도) */
+        daisyDropped=daisyOrder.slice(0,pk.drop);
+        buildDaisy(head,false);buildDaisy(flySvg,true);
+        for(var k=0;k<fall;k++)daisySpawnFall(x,y,k,fall,size);
+      }
     }
     if(t<1)requestAnimationFrame(frame);else linger();
   }
@@ -214,7 +309,7 @@ function daisyClick(){
       fly.style.transform='rotate('+(540+sway)+'deg)';
       var fs=(LDUR-FADE)/LDUR;
       fly.style.opacity=lt<fs?'1':String(Math.max(0,1-(lt-fs)/(1-fs)));
-      if(!shown&&lt>=fs){shown=true;dim.remove();paintPetals();showExcerpt();}   /* 꽃이 사라지기 시작할 때 문장이 그 자리에서 천천히 떠오른다 */
+      if(!shown&&lt>=fs){shown=true;dim.remove();showExcerpt(pk.it);}   /* 꽃이 사라지기 시작할 때 문장이 그 자리에서 천천히 떠오른다 */
       if(lt<1)requestAnimationFrame(lf);
       else{fly.remove();daisyAnimating=false;}
     }
@@ -225,22 +320,32 @@ function daisyClick(){
 
 /* ---------- 발췌 카드 ---------- */
 var exTimer=null;
-function showExcerpt(){
-  var it=pickItem();if(!it)return;
+/* 서지정보: 책제목 / 저자 · 출판사(출판년도) · p.쪽 */
+function bibHTML(it){
+  var b=bookOf(it)||{},pg=it.page?'p.'+String(it.page).replace(/^p\.?\s*/i,''):'';
+  var pub=b.publisher?b.publisher+(b.year?'('+b.year+')':''):(b.year?'('+b.year+')':'');
+  var meta=[b.author,pub,pg].filter(Boolean).join(' · ');
+  if(!b.title&&!meta&&!b.cover)return '';
+  return '<figure class="ex-book">'
+    +(b.cover?'<img class="ex-cover" src="'+esc(b.cover)+'" alt="'+esc(b.title?'〈'+b.title+'〉 표지':'책 표지')+'" onerror="this.remove()">':'')
+    +'<figcaption class="ex-bib">'+(b.title?'<div class="ex-bt">'+esc(b.title)+'</div>':'')+(meta?'<div class="ex-bm">'+esc(meta)+'</div>':'')+'</figcaption></figure>';
+}
+var CM_ICON='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4.5 5.5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17.5h-1A1.5 1.5 0 0 1 3 16V7a1.5 1.5 0 0 1 1.5-1.5Z"/></svg>';
+function showExcerpt(it){
+  if(!it)return;
   closeExcerpt();CUR=it;
-  var src=[it.author,it.book?'〈'+it.book+'〉':'',it.page?('p.'+String(it.page).replace(/^p\.?\s*/i,'')):''].filter(Boolean).join(' ');
   var ov=document.createElement('div');ov.className='ex-ov';ov.id='exOv';
   ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
   ov.onclick=function(e){if(e.target===ov)closeExcerpt();};
   ov.innerHTML='<div class="ex-box">'
     +'<button type="button" class="ex-close" onclick="closeExcerpt()" title="닫기 (Esc)" aria-label="닫기">✕</button>'
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
-    +(src?'<div class="ex-src">— '+esc(src)+'</div>':'')
-    +'<div class="cm-tg-row"><button type="button" class="cm-tg" id="cmTg" onclick="cmToggle()" aria-expanded="false" aria-controls="cmSec">댓글<span class="n" id="cmN"></span></button></div>'
+    +bibHTML(it)
+    +'<div class="cm-tg-row"><button type="button" class="cm-tg" id="cmTg" onclick="cmToggle()" aria-expanded="false" aria-controls="cmSec" aria-label="댓글" title="댓글">'+CM_ICON+'<span class="n" id="cmN"></span></button></div>'
     +'<section class="cm" id="cmSec" aria-label="댓글" aria-hidden="true" inert><div class="cm-in">'
     +'<div class="cm-list" id="cmList"></div>'
     +'<div class="cm-form"><textarea id="cmBody" maxlength="1000"></textarea>'
-    +'<div class="cm-row"><input id="cmName" maxlength="30" placeholder="이름 (선택)" value="'+esc(store('dz_name')||'')+'">'
+    +'<div class="cm-row"><input id="cmName" class="cm-name" maxlength="30" placeholder="이름 (선택)" aria-label="이름 (안 써도 됩니다)" autocomplete="nickname" value="'+esc(store('dz_name')||'')+'">'
     +'<button type="button" class="cm-send" id="cmSend" onclick="cmPost()">남기기</button></div>'
     +'<div class="cm-st" id="cmSt"></div></div></div></section>'
     +'<button type="button" class="ex-next" onclick="closeExcerpt();daisyClick()" title="한 송이 더" aria-label="한 송이 더">'+fallenDaisySVG()+'</button>'
@@ -270,7 +375,7 @@ function cmToggle(){
   }
   tg.classList.toggle('on',open);tg.setAttribute('aria-expanded',open?'true':'false');
 }
-function cmCount(n){var e=document.getElementById('cmN');if(e)e.textContent=n?' '+n:'';}
+function cmCount(n){var e=document.getElementById('cmN'),b=document.getElementById('cmTg');if(e)e.textContent=String(n||0);if(b)b.setAttribute('aria-label','댓글 '+(n||0)+'개');}
 /* 다음 문장 단추: 심플한 데이지 한 송이 (흰 꽃잎 8장 + 노란 가운데) */
 function fallenDaisySVG(){
   var g='';
@@ -313,7 +418,7 @@ function cmPost(){
 function closeExcerpt(){CUR=null;if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
 
 document.getElementById('flowerBtn').addEventListener('click',daisyClick);
-buildDaisy(document.getElementById('headFlower'),false);paintPetals();
+buildDaisy(document.getElementById('headFlower'),false);shelfRender();
 loadExcerpts();
 </script>
 </body>
