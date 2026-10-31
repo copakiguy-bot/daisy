@@ -57,8 +57,9 @@
   @keyframes ovIn{from{background:rgba(18,49,43,.34)}to{background:rgba(18,49,43,.55)}}
   @keyframes boxIn{0%{opacity:0;transform:translateY(12px) scale(.985)}100%{opacity:1;transform:none}}
   @keyframes txtIn{0%{opacity:0;filter:blur(3px)}100%{opacity:1;filter:blur(0)}}
-  .ex-box>.ex-quote{animation:txtIn 1.5s .35s ease-out both}
-  .ex-box>.ex-src,.ex-box>.ex-book{animation:txtIn 1.2s .9s ease-out both}
+  .ex-box>.ex-cvw{animation:txtIn 1.2s .2s ease-out both}
+  .ex-box>.ex-quote{animation:txtIn 1.5s .45s ease-out both}
+  .ex-box>.ex-src,.ex-box>.ex-bib{animation:txtIn 1.2s .95s ease-out both}
   .ex-box>.cm-tg-row,.ex-box>.ex-next{animation:txtIn 1s 1.2s ease-out both}
   .ex-box{background:var(--card);border-radius:22px;padding:46px 42px 34px;max-width:640px;width:100%;max-height:calc(100vh - 40px);overflow:auto;text-align:center;position:relative;box-shadow:0 24px 70px rgba(0,0,0,.3);animation:boxIn 1.1s cubic-bezier(.22,.8,.3,1) both}
   @keyframes expop{0%{opacity:0;transform:scale(.8) translateY(8px)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}
@@ -67,9 +68,9 @@
   .ex-quote{font-size:clamp(16px,2.4vw,20px);line-height:1.85;color:var(--dark);font-family:'Gowun Dodum',sans-serif;word-break:keep-all;white-space:pre-line}
   .ex-src{margin-top:18px;font-size:14px;color:var(--muted)}
   /* 문장 밑: 책 표지 → 서지정보 */
-  .ex-book{margin:26px 0 0;display:flex;flex-direction:column;align-items:center;gap:12px}
+  .ex-cvw{display:flex;justify-content:center;margin:0 0 26px}
   .ex-cover{display:block;height:132px;width:auto;max-width:100px;object-fit:cover;border-radius:3px;box-shadow:0 6px 18px rgba(18,49,43,.16),0 1px 3px rgba(0,0,0,.1);background:#eeebe3}
-  .ex-bib{line-height:1.6}
+  .ex-bib{margin-top:22px;line-height:1.6}
   .ex-bt{font-family:'Gowun Dodum',sans-serif;font-size:15px;color:var(--dark)}
   .ex-bm{font-size:12.5px;color:var(--muted);word-break:keep-all}
   .ex-next{display:block;margin:20px auto 0;border:none;background:none;padding:4px;cursor:pointer;width:76px;height:76px;transition:transform .25s ease;opacity:.92}
@@ -102,7 +103,7 @@
   .cm-send{flex:none;margin-left:auto;border:none;border-radius:9px;padding:7px 16px;background:var(--yellow);color:#3a2a00;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
   .cm-send:disabled{opacity:.5;cursor:default}
   .cm-st{font-size:12px;color:var(--muted);margin-top:6px;min-height:16px}
-  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-cover{height:112px}.ex-book{margin-top:22px}}
+  @media (max-width:520px){.ex-box{padding:40px 22px 28px;border-radius:18px}.ex-cover{height:112px}.ex-cvw{margin-bottom:22px}.ex-bib{margin-top:18px}}
   @media (prefers-reduced-motion:reduce){.ex-ov,.ex-box,.ex-box>*{animation:none!important}.daisy-fp{display:none}.cm{transition:none!important}}
 </style>
 </head>
@@ -320,15 +321,17 @@ function daisyClick(){
 
 /* ---------- 발췌 카드 ---------- */
 var exTimer=null;
-/* 서지정보: 책제목 / 저자 · 출판사(출판년도) · p.쪽 */
+/* 문장 위: 책 표지 / 문장 아래: 서지정보 (책제목 · 저자 · 출판사(출판년도) · p.쪽) */
+function coverHTML(it){
+  var b=bookOf(it)||{};if(!b.cover)return '';
+  return '<div class="ex-cvw"><img class="ex-cover" src="'+esc(b.cover)+'" alt="'+esc(b.title?'〈'+b.title+'〉 표지':'책 표지')+'" onerror="this.parentNode.remove()"></div>';
+}
 function bibHTML(it){
   var b=bookOf(it)||{},pg=it.page?'p.'+String(it.page).replace(/^p\.?\s*/i,''):'';
   var pub=b.publisher?b.publisher+(b.year?'('+b.year+')':''):(b.year?'('+b.year+')':'');
   var meta=[b.author,pub,pg].filter(Boolean).join(' · ');
-  if(!b.title&&!meta&&!b.cover)return '';
-  return '<figure class="ex-book">'
-    +(b.cover?'<img class="ex-cover" src="'+esc(b.cover)+'" alt="'+esc(b.title?'〈'+b.title+'〉 표지':'책 표지')+'" onerror="this.remove()">':'')
-    +'<figcaption class="ex-bib">'+(b.title?'<div class="ex-bt">'+esc(b.title)+'</div>':'')+(meta?'<div class="ex-bm">'+esc(meta)+'</div>':'')+'</figcaption></figure>';
+  if(!b.title&&!meta)return '';
+  return '<div class="ex-bib">'+(b.title?'<div class="ex-bt">'+esc(b.title)+'</div>':'')+(meta?'<div class="ex-bm">'+esc(meta)+'</div>':'')+'</div>';
 }
 var CM_ICON='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M4.5 5.5h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17.5h-1A1.5 1.5 0 0 1 3 16V7a1.5 1.5 0 0 1 1.5-1.5Z"/></svg>';
 function showExcerpt(it){
@@ -339,6 +342,7 @@ function showExcerpt(it){
   ov.onclick=function(e){if(e.target===ov)closeExcerpt();};
   ov.innerHTML='<div class="ex-box">'
     +'<button type="button" class="ex-close" onclick="closeExcerpt()" title="닫기 (Esc)" aria-label="닫기">✕</button>'
+    +coverHTML(it)
     +'<div class="ex-quote">'+esc(it.text)+'</div>'
     +bibHTML(it)
     +'<div class="cm-tg-row"><button type="button" class="cm-tg" id="cmTg" onclick="cmToggle()" aria-expanded="false" aria-controls="cmSec" aria-label="댓글" title="댓글">'+CM_ICON+'<span class="n" id="cmN"></span></button></div>'
