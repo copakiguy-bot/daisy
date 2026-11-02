@@ -88,6 +88,57 @@
   .imp .g .s{font-weight:400}
   .imp .ex{padding-left:34px}
   @media (max-width:560px){.bk-form{flex-direction:column}.bk-fields .row{flex-wrap:wrap}}
+  /* 목차 상자 (HMD 와 같은 모양): 부 · 장 · 절 */
+  .toc-wrap{margin-top:12px}
+  .toc-wrap>.fl{font-size:12.5px;font-weight:800;color:var(--dark);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .toc-wrap>.fl span{font-weight:400;color:var(--muted);font-size:12px}
+  .lunar-toggle{border:1px solid var(--line);background:var(--cream);color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;border-radius:7px;padding:3px 9px;cursor:pointer}
+  .lunar-toggle.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+  .ch-lvsel{border:1px solid var(--line);background:#fff;border-radius:6px;font-family:inherit;font-size:11px;color:var(--muted);padding:2px 3px;flex:none;cursor:pointer}
+  .lb-sub{font-weight:600;color:var(--muted);font-size:11.5px}
+  .toc-box{border:1px solid var(--line);border-radius:12px;padding:10px 12px 12px;background:#fcfcfa}
+  .toc-add{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .toc-add input{flex:1;min-width:170px;border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-family:inherit;font-size:13px;background:#fff}
+  .toc-add input:focus{outline:none;border-color:var(--yellow)}
+  .toc-box .btn{flex:none;padding:6px 12px;font-size:12px}
+  .toc-lv{display:inline-flex;gap:4px;flex:none}
+  .toc-lv .lunar-toggle{padding:4px 11px}
+  .toc-none{margin-top:10px;font-size:12px;color:var(--muted);background:var(--cream);border-radius:9px;padding:9px 11px}
+  .toc-body{display:flex;gap:8px;align-items:flex-start;margin-top:9px;border-top:1px dashed var(--line);padding-top:6px}
+  .toc-list{flex:1;min-width:0;max-height:260px;overflow:auto}
+  .toc-li{display:flex;align-items:center;gap:7px;padding:4px 4px 4px 6px;border-radius:7px}
+  .toc-li:hover{background:var(--cream)}
+  .toc-li .t{flex:1;min-width:0;outline:none;font-size:13px;word-break:break-word;display:block}
+  .toc-li .t:focus{background:#fff;border-radius:5px;box-shadow:0 0 0 1.5px var(--yellow);padding:1px 5px}
+  .toc-li.lv1 .t{font-weight:800;color:var(--dark);font-size:13.5px}
+  .toc-li.lv2 .t{font-weight:700}
+  .toc-li.lv3 .t{font-size:12.5px;color:var(--muted)}
+  .toc-li .del{color:#cfd6d2;cursor:pointer;font-size:16px;padding:0 4px;line-height:1}
+  .toc-li .del:hover{color:var(--red)}
+  .toc-li .nx{flex:none;font-size:11px;color:var(--green);font-weight:700}
+  .toc-ck{flex:none;width:15px;height:15px;margin:0;accent-color:#f4b740;cursor:pointer}
+  .toc-li.sel{background:#fff6dc}
+  .toc-tools{flex:none;display:flex;flex-direction:column;align-items:stretch;gap:5px;width:64px;padding:6px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .toc-tools .tt-n{font-size:11px;font-weight:800;color:var(--muted);text-align:center}
+  .toc-tools .tt-b{border:1px solid var(--line);background:#fff;border-radius:8px;font-size:15px;padding:7px 0;cursor:pointer;color:var(--dark);font-family:inherit}
+  .toc-tools .tt-b:not(:disabled):hover{background:#fff3c4;border-color:#f4b740}
+  .toc-tools .tt-s{border:1px solid var(--line);background:#fff;border-radius:7px;font-size:11px;padding:4px 0;cursor:pointer;color:var(--dark);font-family:inherit}
+  .toc-tools .tt-s:not(:disabled):hover{border-color:#f4b740}
+  .toc-tools .tt-lv{font-size:11px;padding:3px 2px;border-radius:7px;border:1px solid var(--line);width:100%}
+  .toc-tools button:disabled,.toc-tools select:disabled{opacity:.4;cursor:default}
+  .toc-paste{margin-top:9px}
+  .toc-paste textarea{width:100%;resize:vertical;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:12.5px;line-height:1.6;background:#fff}
+  .toc-paste-f{display:flex;align-items:center;gap:7px;margin-top:6px;flex-wrap:wrap}
+  .toc-paste-f .lb-sub{flex:1;min-width:150px}
+  .toc-full-bg{position:fixed;inset:0;background:rgba(18,30,26,.45);z-index:40;display:none}
+  .toc-box.toc-full{position:fixed;left:50%;top:4vh;transform:translateX(-50%);width:min(980px,94vw);height:92vh;z-index:50;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,.35);background:#fff;padding:16px 18px}
+  .toc-box.toc-full .toc-body{flex:1;min-height:0}
+  .toc-box.toc-full .toc-list{max-height:none;height:100%}
+  .toc-box.toc-full .toc-li{padding-top:6px;padding-bottom:6px}
+  .toc-box.toc-full .toc-li .t{font-size:15.5px}
+  .toc-box.toc-full .toc-li.lv1 .t{font-size:17px}
+  .toc-box.toc-full .toc-li.lv3 .t{font-size:14.5px}
+  .toc-box.toc-full .toc-fullbtn{background:var(--dark);color:#fff}
   details summary{cursor:pointer;color:var(--muted);font-size:13px}
   .help{font-size:12.5px;color:var(--muted);line-height:1.75;margin-top:8px}
   .help code{background:var(--cream);padding:1px 5px;border-radius:4px}
@@ -130,9 +181,10 @@
         <div class="row"><input id="bPub" class="in" style="flex:1" placeholder="출판사"><input id="bYear" class="in" inputmode="numeric" style="width:96px" placeholder="출판년도"></div>
         <div class="row"><input id="bCover" class="in" style="flex:1" placeholder="표지 이미지 주소 (ISBN 조회로 채워짐)" oninput="bkCvPaint()">
           <span class="btn ghost file-btn" title="표지 사진 파일 올리기">사진<input type="file" accept="image/*" onchange="bkCvFile(this)"></span></div>
-        <div class="row"><button class="btn" id="bSave" onclick="bkSave()">＋ 책 등록</button><button class="btn ghost" id="bCancel" style="display:none" onclick="bkClear()">취소</button><button class="btn ghost" onclick="bkClear()" id="bClr">비우기</button></div>
       </div>
     </div>
+    <div class="toc-wrap"><div class="fl">목차 <span>부 · 장 · 절을 골라 한 줄씩 넣거나, 📋 붙여넣기로 통째로</span></div><div class="toc-box" id="tocBox_b"></div></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="bSave" onclick="bkSave()">＋ 책 등록</button><button class="btn ghost" id="bCancel" style="display:none" onclick="bkClear()">취소</button><button class="btn ghost" onclick="bkClear()" id="bClr">비우기</button></div>
     <div id="bkList" style="margin-top:12px"></div>
   </div>
 
@@ -142,6 +194,7 @@
     <div id="pvNew"></div>
     <div class="row" style="margin-top:8px">
       <select id="nBook" class="in" style="flex:1;min-width:180px" onchange="bkSelChange(this)"></select>
+      <select id="nCh" class="in" style="flex:1;min-width:150px;display:none" onchange="ls('dz_lastch',this.value)" title="이 문장이 나온 목차"></select>
       <input id="nPage" class="in" style="width:80px" placeholder="쪽">
       <button class="btn" onclick="addItem()">＋ 추가</button>
     </div>
@@ -241,6 +294,7 @@ function findBook(title,author){
 function addBookObj(o){
   var b={id:nextBookId(),title:String(o.title||'').trim(),author:String(o.author||'').trim(),publisher:String(o.publisher||'').trim(),
     year:String(o.year||'').trim(),isbn:String(o.isbn||'').trim(),cover:String(o.cover||'').trim()};
+  if(Array.isArray(o.chapters)&&o.chapters.length)b.chapters=o.chapters.map(tocOne).filter(Boolean);
   DATA.books.push(b);return b;
 }
 function bookOf(x){return bookById(x.bookId);}
@@ -255,7 +309,12 @@ function paintBar(){
   $('saveBtn').disabled=!tok();
   $('dirtyTxt').textContent=tok()?'바뀐 내용이 있습니다 · 게시해야 데이지에 반영됩니다':'바뀐 내용이 있습니다 · 게시하려면 위 «연결»에 토큰을 넣으세요';
 }
-function srcStr(x){var b=bookOf(x)||{};return [b.title?'〈'+b.title+'〉':'',b.author,pubStr(b),x.page?'p.'+x.page:''].filter(Boolean).join(' · ');}
+function srcStr(x){var b=bookOf(x)||{};return [b.title?'〈'+b.title+'〉':'',b.author,pubStr(b),x.chapter?'«'+x.chapter+'»':'',x.page?'p.'+x.page:''].filter(Boolean).join(' · ');}
+/* 목차 고르기: 고른 책의 부·장·절을 들여쓰기로 */
+function chOptions(bid,sel){var b=bookById(bid),L=(b&&b.chapters||[]).map(tocOne).filter(Boolean);if(!L.length)return '';
+  return '<option value="">— 목차 —</option>'+L.map(function(c){return '<option value="'+esc(c.t)+'"'+(c.t===sel?' selected':'')+'>'+new Array(c.lv).join('\u00a0\u00a0\u00a0')+esc(c.t)+'</option>';}).join('')
+    +(sel&&!L.some(function(c){return c.t===sel;})?'<option value="'+esc(sel)+'" selected>'+esc(sel)+' (목차에 없음)</option>':'');}
+function chSelFill(selId,bid,sel){var el=$(selId);if(!el)return;var h=chOptions(bid,sel);el.innerHTML=h;el.style.display=h?'':'none';}
 
 /* ---- 줄바꿈 미리보기: 데이지 카드와 같은 글꼴 · 글자 크기 · 줄 너비 ----
    컴퓨터 = 카드 안쪽 556px · 20px / 아이폰(390px 화면) = 306px · 16px */
@@ -274,13 +333,15 @@ function bookOptions(sel,withNew,firstLabel){
 }
 function bkSelChange(el){
   if(el.value==='__new'){el.value='';$('bkCard').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$('bIsbn').focus();},350);return;}
-  if(el.id==='nBook')ls('dz_lastbook',el.value);
+  if(el.id==='nBook'){ls('dz_lastbook',el.value);chSelFill('nCh',el.value,'');}
+  if(el.id==='eBook')chSelFill('eCh',el.value,'');
 }
 function renderAll(){renderBooks();renderSelects();render();}
 function renderSelects(){
   var keep=$('nBook').value||ls('dz_lastbook');
   $('nBook').innerHTML=bookOptions(keep,true);
   if(!bookById(keep))$('nBook').value='';
+  var kc=$('nCh').value||ls('dz_lastch');chSelFill('nCh',$('nBook').value,kc);
   var f=$('fBook').value;
   $('fBook').innerHTML=bookOptions(f,false,'모든 책');
   if(f&&!bookById(f))$('fBook').value='';
@@ -299,6 +360,7 @@ function render(){
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPcE"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPhE"></div></div></div></div></div>'
       +'<div class="row" style="margin-top:6px"><select id="eBook" class="in" style="flex:1;min-width:160px" onchange="bkSelChange(this)">'+bookOptions(x.bookId,true)+'</select>'
+      +'<select id="eCh" class="in" style="flex:1;min-width:140px'+(chOptions(x.bookId,x.chapter)?'':';display:none')+'">'+chOptions(x.bookId,x.chapter)+'</select>'
       +'<input id="ePage" class="in" style="width:80px" value="'+esc(x.page||'')+'" placeholder="쪽">'
       +'<button class="btn" onclick="editSave('+x.id+')">확인</button><button class="btn ghost" onclick="EDIT=null;render()">취소</button></div></div></div>';
     var nc=CMS.filter(function(c){return c.excerpt_id===String(x.id)&&!c.hidden;}).length;
@@ -315,6 +377,7 @@ function addItem(){
   if(DATA.items.some(function(x){return x.text.trim()===t;})){if(!confirm('같은 문장이 이미 있습니다. 그래도 추가할까요?'))return;}
   var it={id:nextId(),text:t,page:$('nPage').value.trim().replace(/^p\.?\s*/i,''),added:today()};
   if(bid)it.bookId=Number(bid)||bid;
+  var ch=$('nCh').style.display==='none'?'':$('nCh').value;if(ch)it.chapter=ch;
   DATA.items.push(it);ls('dz_lastbook',bid);
   $('nText').value='';$('nPage').value='';pvSync('nText','');setDirty();renderBooks();render();$('nText').focus();
 }
@@ -323,6 +386,7 @@ function editSave(id){
   var t=$('eText').value.trim();if(!t){alert('문장이 비었습니다.');return;}
   x.text=t;var bid=$('eBook').value;if(bid&&bid!=='__new')x.bookId=Number(bid)||bid;else delete x.bookId;
   x.page=$('ePage').value.trim().replace(/^p\.?\s*/i,'');
+  var ch=$('eCh')&&$('eCh').style.display!=='none'?$('eCh').value:'';if(ch)x.chapter=ch;else delete x.chapter;
   EDIT=null;setDirty();renderBooks();render();
 }
 function delItem(id){
@@ -338,13 +402,13 @@ function renderBooks(){
   $('bkList').innerHTML=bs.length?bs.map(function(b){
     var n=bookCount(b.id),cv=coverSrc(b);
     return '<div class="bk'+(BEDIT===b.id?' on':'')+'">'+(cv?'<img class="bk-cv" src="'+esc(cv)+'" alt="" onerror="this.style.visibility=\'hidden\'">':'<span class="bk-cv"></span>')
-      +'<div class="q"><div class="t">'+esc(b.title||'(제목 없음)')+'</div><div class="m">'+esc([b.author,pubStr(b),b.isbn?'ISBN '+b.isbn:''].filter(Boolean).join(' · '))
+      +'<div class="q"><div class="t">'+esc(b.title||'(제목 없음)')+'</div><div class="m">'+esc([b.author,pubStr(b),b.isbn?'ISBN '+b.isbn:'',(b.chapters&&b.chapters.length)?'목차 '+b.chapters.length:''].filter(Boolean).join(' · '))
       +(n?' · <button class="n" onclick="bkFilter('+b.id+')">문장 '+n+'</button>':' · 문장 0')+'</div></div>'
       +'<div class="act"><button onclick="bkEdit('+b.id+')">고치기</button><button class="del" onclick="bkDel('+b.id+')">지우기</button></div></div>';
   }).join(''):'<div class="empty">아직 책이 없습니다. ISBN 으로 찾거나 직접 적어 등록하세요.</div>';
 }
 function bkFilter(id){$('fBook').value=String(id);$('q').value='';render();$('listCard').scrollIntoView({behavior:'smooth',block:'start'});}
-function bkForm(){return {title:$('bTitle').value.trim(),author:$('bAuthor').value.trim(),publisher:$('bPub').value.trim(),year:$('bYear').value.trim().replace(/[^0-9]/g,'').slice(0,4),isbn:$('bIsbn').value.replace(/[^0-9Xx]/g,''),cover:$('bCover').value.trim()};}
+function bkForm(){return {chapters:tocBoxVal('b'),title:$('bTitle').value.trim(),author:$('bAuthor').value.trim(),publisher:$('bPub').value.trim(),year:$('bYear').value.trim().replace(/[^0-9]/g,'').slice(0,4),isbn:$('bIsbn').value.replace(/[^0-9Xx]/g,''),cover:$('bCover').value.trim()};}
 function bkFill(o){
   if(o.title!=null)$('bTitle').value=o.title;if(o.author!=null)$('bAuthor').value=o.author;
   if(o.publisher!=null)$('bPub').value=o.publisher;if(o.year!=null)$('bYear').value=o.year;
@@ -354,17 +418,23 @@ function bkCvPaint(){
   var v=$('bCover').value.trim(),src=COVER_CACHE[v]||v,box=$('bCvBox');
   box.innerHTML=src?'<img src="'+esc(src)+'" alt="표지" onerror="this.parentNode.textContent=\'표지를 못 불러옴\'">':'표지';
 }
-function bkClear(){BEDIT=null;bkFill({title:'',author:'',publisher:'',year:'',isbn:'',cover:''});$('bSave').textContent='＋ 책 등록';$('bCancel').style.display='none';$('bClr').style.display='';st('bkSt','');renderBooks();}
+function bkClear(){BEDIT=null;bkFill({title:'',author:'',publisher:'',year:'',isbn:'',cover:''});tocBoxInit('b',[]);$('bSave').textContent='＋ 책 등록';$('bCancel').style.display='none';$('bClr').style.display='';st('bkSt','');renderBooks();}
 function bkEdit(id){
   var b=bookById(id);if(!b)return;BEDIT=b.id;
-  bkFill({title:b.title||'',author:b.author||'',publisher:b.publisher||'',year:b.year||'',isbn:b.isbn||'',cover:b.cover||''});
+  bkFill({title:b.title||'',author:b.author||'',publisher:b.publisher||'',year:b.year||'',isbn:b.isbn||'',cover:b.cover||''});tocBoxInit('b',b.chapters||[]);
   $('bSave').textContent='고친 것 저장';$('bCancel').style.display='';$('bClr').style.display='none';
   st('bkSt','«'+(b.title||'')+'» 고치는 중 · ISBN 조회로 비어 있는 정보를 다시 채울 수도 있습니다');renderBooks();
   $('bkCard').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function bkSave(){
   var f=bkForm();if(!f.title){alert('책 제목을 넣으세요. (ISBN 조회로 채울 수 있습니다)');$('bTitle').focus();return;}
-  if(BEDIT!=null){var b=bookById(BEDIT);if(b)Object.assign(b,f);st('bkSt','고쳤습니다 · 게시하면 저장됩니다','ok');}
+  if(BEDIT!=null){var b=bookById(BEDIT);
+    if(b){
+      /* 목차 이름을 고쳤으면 그 목차에 달린 문장도 따라가게 */
+      var ren={};tocBoxState('b').list.forEach(function(c){if(c.__o&&c.__o!==c.t)ren[c.__o]=c.t;});
+      DATA.items.forEach(function(x){if(String(x.bookId)===String(b.id)&&x.chapter&&ren[x.chapter])x.chapter=ren[x.chapter];});
+      Object.assign(b,f);}
+    st('bkSt','고쳤습니다 · 게시하면 저장됩니다','ok');}
   else{
     var dup=findBook(f.title,f.author);
     if(dup&&normT(dup.author)===normT(f.author)&&!confirm('«'+f.title+'» 이(가) 이미 있습니다. 그래도 새로 등록할까요?'))return;
@@ -447,6 +517,188 @@ function bkLookup(){
     var dup=!editing&&findBook(f.title,f.author);
     st('bkSt','찾았습니다 ('+info.src+')'+(dup?' · 같은 제목의 책이 이미 있습니다':' · 확인하고 «책 등록»을 누르세요'),dup?'err':'ok');
   });
+}
+
+/* ---------- 목차: 부(1) · 장(2) · 절(3) 세 단 (HMD 와 같은 방식) ---------- */
+var TOC_LVN={1:'부',2:'장',3:'절'};
+function escA(s){return esc(s);}
+function tocName(c){return typeof c==='string'?String(c):String((c&&c.t)||'');}
+function tocGuess(t){
+  t=String(t||'').trim();
+  if(/(^|[\s\d])(부|편)([\s.·:]|$)/.test(t)||/^제?\s*[0-9IVX]+\s*(부|편)/.test(t))return 1;
+  if(/(^|[\s\d])(장)([\s.·:]|$)/.test(t)||/^제?\s*[0-9IVX]+\s*장/.test(t)||/chapter/i.test(t))return 2;
+  if(/(^|[\s\d])(절|항)([\s.·:]|$)/.test(t)||/^제?\s*[0-9IVX]+\s*(절|항)/.test(t))return 3;
+  return 1;
+}
+function tocLv(c){var v=+(c&&c.lv);return (v===1||v===2||v===3)?v:tocGuess(tocName(c));}
+function tocOne(c){var t=tocName(c).replace(/^[\s　]+/,'').trim();return t?{t:t,lv:tocLv(c)}:null;}
+var TOCB={};
+function tocBoxState(k){return TOCB[k]||(TOCB[k]={list:[],lv:1,paste:false});}
+function tocBoxInit(k,chs){
+  var st=tocBoxState(k);
+  st.list=(chs||[]).map(tocOne).filter(Boolean).map(function(c){c.__o=c.t;return c;});st.paste=false;st.lastSel=null;
+  if(!st.list.length)st.lv=1;
+  if(st.full)tocBoxFull(k);
+  tocBoxRender(k);
+}
+function tocBoxVal(k){return tocBoxState(k).list.map(tocOne).filter(Boolean);}
+function tocBoxPh(lv){return '새 '+TOC_LVN[lv]+' 이름 (예: '+(lv===1?'1부 인지혁명':lv===2?'1장 뇌의 혁명':'1절 언어의 탄생')+')';}
+function tocChCount(k,name){if(k!=='b'||BEDIT==null)return 0;return DATA.items.filter(function(x){return String(x.bookId)===String(BEDIT)&&x.chapter===name;}).length;}
+function tocBoxRender(k){
+  var el=document.getElementById('tocBox_'+k);if(!el)return;
+  var st=tocBoxState(k);
+  var head='<div class="toc-add">'
+    +'<span class="toc-lv">'+[1,2,3].map(function(v){
+      return '<button type="button" class="lunar-toggle'+(st.lv===v?' on':'')+'" data-lv="'+v+'" onclick="tocBoxLv(\''+k+'\','+v+')" title="'+TOC_LVN[v]+' 단으로 넣기">'+TOC_LVN[v]+'</button>';}).join('')+'</span>'
+    +'<input id="tocIn_'+k+'" placeholder="'+escA(tocBoxPh(st.lv))+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();tocBoxAdd(\''+k+'\');}">'
+    +'<button type="button" class="btn" onclick="tocBoxAdd(\''+k+'\')">추가</button>'
+    +'<button type="button" class="btn ghost" onclick="tocBoxPasteTgl(\''+k+'\')" title="목차를 통째로 붙여넣기">📋 붙여넣기</button>'
+    +'<button type="button" class="btn ghost toc-fullbtn" onclick="tocBoxFull(\''+k+'\')" title="목차만 크게 보기 (Esc 닫기)">'+(st.full?'✕ 닫기':'⤢ 크게')+'</button>'
+    +'</div>';
+  var paste=st.paste?('<div class="toc-paste">'
+    +'<textarea id="tocPaste_'+k+'" rows="6" placeholder="1부 인지혁명&#10;  1장 뇌의 혁명&#10;    1절 언어의 탄생&#10;2부 농업혁명"></textarea>'
+    +'<div class="toc-paste-f"><span class="lb-sub">있는 목차·문장은 그대로 두고 빠진 것만 넣으며, 붙여넣은 순서로 다시 정렬 · 들여쓰기 2칸 = 한 단 아래 · «a /b /c» 줄은 절 여러 개</span>'
+    +'<button type="button" class="btn" onclick="tocBoxPasteDo(\''+k+'\')">넣기</button>'
+    +'<button type="button" class="btn ghost" onclick="tocBoxPasteTgl(\''+k+'\')">닫기</button></div></div>'):'';
+  var nSel=st.list.filter(function(c){return c.__sel;}).length;
+  var list=st.list.length?('<div class="toc-body"><div class="toc-list" id="tocList_'+k+'">'+st.list.map(function(c,i){
+    var nx=tocChCount(k,c.__o||c.t);
+    return '<div class="toc-li lv'+c.lv+(c.__sel?' sel':'')+'" data-i="'+i+'" style="padding-left:'+(4+(c.lv-1)*20)+'px">'
+      +'<input type="checkbox" class="toc-ck"'+(c.__sel?' checked':'')+' title="골라서 오른쪽 ▲▼로 옮기기 (Shift = 범위 선택)" onclick="tocSelClick(event,\''+k+'\','+i+')">'
+      +'<select class="ch-lvsel" title="단 바꾸기" onchange="tocBoxLvSet(\''+k+'\','+i+',this.value)">'
+      +[1,2,3].map(function(v){return '<option value="'+v+'"'+(v===c.lv?' selected':'')+'>'+TOC_LVN[v]+'</option>';}).join('')+'</select>'
+      +'<span class="t" contenteditable onblur="tocBoxName(\''+k+'\','+i+',this.innerText)">'+esc(c.t)+'</span>'
+      +(nx?'<span class="nx" title="이 목차에 달린 문장">'+nx+'</span>':'')
+      +'<span class="del" onclick="tocBoxDel(\''+k+'\','+i+')">×</span></div>';
+  }).join('')+'</div>'
+    +'<div class="toc-tools" id="tocTools_'+k+'">'
+    +'<span class="tt-n" id="tocSelN_'+k+'">'+(nSel?nSel+'개':'선택')+'</span>'
+    +'<button type="button" class="tt-b" onclick="tocSelMove(\''+k+'\',-1)" title="고른 것 위로 한 칸"'+(nSel?'':' disabled')+'>▲</button>'
+    +'<button type="button" class="tt-b" onclick="tocSelMove(\''+k+'\',1)" title="고른 것 아래로 한 칸"'+(nSel?'':' disabled')+'>▼</button>'
+    +'<button type="button" class="tt-s" onclick="tocSelMove(\''+k+'\',-99999)" title="맨 위로"'+(nSel?'':' disabled')+'>⤒</button>'
+    +'<button type="button" class="tt-s" onclick="tocSelMove(\''+k+'\',99999)" title="맨 아래로"'+(nSel?'':' disabled')+'>⤓</button>'
+    +'<select class="tt-lv" onchange="tocSelLv(\''+k+'\',this.value);this.value=\'\'" title="고른 것 단 바꾸기"'+(nSel?'':' disabled')+'><option value="">단</option><option value="1">부</option><option value="2">장</option><option value="3">절</option></select>'
+    +'<button type="button" class="tt-s" onclick="tocSelKids(\''+k+'\')" title="고른 부·장 아래 항목까지 함께 고르기"'+(nSel?'':' disabled')+'>+하위</button>'
+    +'<button type="button" class="tt-s" onclick="tocSelNone(\''+k+'\')" title="선택 해제"'+(nSel?'':' disabled')+'>해제</button>'
+    +'</div></div>'):'<div class="toc-none">아직 넣은 목차가 없습니다. 위에서 <b>부·장·절</b>을 고르고 이름을 넣거나, 📋 붙여넣기로 목차를 통째로 넣어 보세요.</div>';
+  var oldL=document.getElementById('tocList_'+k),keepTop=oldL?oldL.scrollTop:0;
+  el.innerHTML=head+paste+list;
+  var nl=document.getElementById('tocList_'+k);if(nl)nl.scrollTop=keepTop;
+  el.classList.toggle('toc-full',!!st.full);
+}
+function tocSelPaint(k){
+  var st=tocBoxState(k),n=st.list.filter(function(c){return c.__sel;}).length;
+  var box=document.getElementById('tocBox_'+k);if(!box)return;
+  box.querySelectorAll('.toc-li').forEach(function(r){var i=+r.getAttribute('data-i'),c=st.list[i];if(!c)return;r.classList.toggle('sel',!!c.__sel);var ck=r.querySelector('.toc-ck');if(ck)ck.checked=!!c.__sel;});
+  var nn=document.getElementById('tocSelN_'+k);if(nn)nn.textContent=n?n+'개':'선택';
+  box.querySelectorAll('#tocTools_'+k+' button, #tocTools_'+k+' select').forEach(function(b){b.disabled=!n;});
+}
+function tocSelClick(e,k,i){
+  var st=tocBoxState(k),c=st.list[i];if(!c)return;
+  if(e.shiftKey&&st.lastSel!=null&&st.list[st.lastSel]){var a=Math.min(st.lastSel,i),b=Math.max(st.lastSel,i);for(var j=a;j<=b;j++)st.list[j].__sel=true;}
+  else c.__sel=!c.__sel;
+  st.lastSel=i;tocSelPaint(k);
+}
+function tocSelNone(k){var st=tocBoxState(k);st.list.forEach(function(c){c.__sel=false;});st.lastSel=null;tocSelPaint(k);}
+function tocSelKids(k){var L=tocBoxState(k).list;for(var i=0;i<L.length;i++){if(!L[i].__sel)continue;for(var j=i+1;j<L.length&&L[j].lv>L[i].lv;j++)L[j].__sel=true;}tocSelPaint(k);}
+function tocSelLv(k,v){v=+v;if(!(v>=1&&v<=3))return;tocBoxState(k).list.forEach(function(c){if(c.__sel)c.lv=v;});tocBoxRender(k);}
+function tocSelMove(k,d){
+  var st=tocBoxState(k),L=st.list,steps=Math.min(Math.abs(d),L.length),dir=d<0?-1:1,moved=false;
+  for(var s2=0;s2<steps;s2++){
+    var any=false;
+    if(dir<0){for(var i=1;i<L.length;i++)if(L[i].__sel&&!L[i-1].__sel){var t=L[i];L[i]=L[i-1];L[i-1]=t;any=true;}}
+    else{for(var j=L.length-2;j>=0;j--)if(L[j].__sel&&!L[j+1].__sel){var t2=L[j];L[j]=L[j+1];L[j+1]=t2;any=true;}}
+    if(!any)break;moved=true;
+  }
+  if(!moved)return;
+  st.lastSel=null;tocBoxRender(k);
+  var box=document.getElementById('tocList_'+k);if(box){var f=box.querySelector('.toc-li.sel');
+    if(f){var r=f.getBoundingClientRect(),br=box.getBoundingClientRect();if(r.top<br.top||r.bottom>br.bottom)box.scrollTop+=r.top-br.top-box.clientHeight/3;}}
+}
+function tocBoxFull(k){
+  var st=tocBoxState(k);st.full=!st.full;
+  var bg=document.getElementById('tocFullBg');
+  if(st.full){if(!bg){bg=document.createElement('div');bg.id='tocFullBg';bg.className='toc-full-bg';document.body.appendChild(bg);}
+    bg.onclick=function(){tocBoxFull(k);};bg.style.display='block';document.addEventListener('keydown',tocFullEsc,true);window.__tocFullK=k;}
+  else{if(bg)bg.style.display='none';document.removeEventListener('keydown',tocFullEsc,true);window.__tocFullK=null;}
+  tocBoxRender(k);
+}
+function tocFullEsc(e){if(e.key==='Escape'&&window.__tocFullK){e.stopPropagation();e.preventDefault();tocBoxFull(window.__tocFullK);}}
+function tocBoxLv(k,v){var st=tocBoxState(k);st.lv=(v===2||v===3)?v:1;tocBoxRender(k);var i=document.getElementById('tocIn_'+k);if(i)i.focus();}
+function tocBoxAdd(k){
+  var st=tocBoxState(k),inp=document.getElementById('tocIn_'+k);if(!inp)return;
+  var v=inp.value.trim();if(!v)return;
+  if(st.list.some(function(c){return c.t===v;})){alert('같은 이름의 목차가 이미 있습니다.');return;}
+  st.list.push({t:v,lv:st.lv});tocBoxRender(k);
+  var i2=document.getElementById('tocIn_'+k);if(i2){i2.value='';i2.focus();}
+}
+function tocBoxDel(k,i){var st=tocBoxState(k);st.list.splice(i,1);tocBoxRender(k);}
+function tocBoxLvSet(k,i,v){var st=tocBoxState(k);if(!st.list[i])return;st.list[i].lv=(+v===2||+v===3)?+v:1;tocBoxRender(k);}
+function tocBoxName(k,i,t){var st=tocBoxState(k);if(!st.list[i])return;var v=String(t).trim();if(!v){tocBoxRender(k);return;}st.list[i].t=v;tocBoxRender(k);}
+function tocBoxPasteTgl(k){var st=tocBoxState(k);st.paste=!st.paste;tocBoxRender(k);if(st.paste){var t=document.getElementById('tocPaste_'+k);if(t)t.focus();}}
+function tocNorm(t){
+  return String(t||'').replace(/^\s*(제\s*)?[0-9IVX]+(\s*[·.,]\s*[0-9]+)*\s*(부|편|장|절|항)\s*/,'')
+    .replace(/^\s*[0-9]+\s*[.)]\s*/,'').replace(/[\s·・,.:;()\[\]「」『』'"‘’“”∼~\-–—]/g,'').toLowerCase();
+}
+function tocParseRich(text){
+  var out=[],curCh='';
+  String(text||'').split('\n').forEach(function(l){
+    var raw=String(l).replace(/\t/g,'  ').replace(/　/g,'  ');
+    var line=raw.trim().replace(/^[-·•]\s+/,'');if(!line)return;
+    if(/^[0-9]+\s*권$/.test(line))return;
+    if((line.match(/\//g)||[]).length>=1&&/\s\/|\/\s/.test(line)){line.split(/\s*\/\s*/).forEach(function(x){x=x.trim();if(x)out.push({t:x,lv:3,ch:curCh});});return;}
+    var ind=(raw.match(/^ */)||[''])[0].length;
+    var lv=ind>=4?3:(ind>=2?2:tocGuess(line));
+    if(lv===2){var m=line.match(/^(제\s*)?([0-9]+)\s*장/);curCh=m?m[2]+'장':'';}
+    out.push({t:line,lv:lv,ch:curCh});
+  });
+  var seen={};
+  out.forEach(function(c){var n=tocNorm(c.t);if(seen[n]){c.t=c.t+(c.ch?' ('+c.ch+')':' (2)');}seen[n]=1;});
+  return out.map(function(c){return {t:c.t,lv:c.lv};});
+}
+function tocMerge(oldList,pasted,opt){
+  var old=(oldList||[]).map(function(c){var o=tocOne(c);if(o&&c.__o)o.__o=c.__o;return o;}).filter(Boolean),used=old.map(function(){return false;});
+  var out=[],kept=0,added=0;
+  var find=function(t){
+    var n=tocNorm(t),i;
+    for(i=0;i<old.length;i++)if(!used[i]&&old[i].t===t)return i;
+    for(i=0;i<old.length;i++)if(!used[i]&&tocNorm(old[i].t)===n)return i;
+    if(n.length>=4){var hit=-1,cnt=0;
+      for(i=0;i<old.length;i++){if(used[i]||/\//.test(old[i].t))continue;var on=tocNorm(old[i].t);if(on.length>=4&&(on.indexOf(n)>=0||n.indexOf(on)>=0)){hit=i;cnt++;}}
+      if(cnt===1)return hit;}
+    return -1;
+  };
+  pasted.forEach(function(p){
+    var i=find(p.t);
+    if(i>=0){used[i]=true;kept++;out.push({t:old[i].t,lv:p.lv,__o:old[i].__o});}
+    else{if(out.some(function(x){return x.t===p.t;})||old.some(function(x,j){return !used[j]&&x.t===p.t;}))return;added++;out.push({t:p.t,lv:p.lv});}
+  });
+  var hasEx=(opt&&opt.hasEx)||function(){return false;},remap={},dropped=0,left=[];
+  var outByNorm={};out.forEach(function(x){var n=tocNorm(x.t);if(!outByNorm[n])outByNorm[n]=x.t;});
+  old.forEach(function(c,i){
+    if(used[i])return;
+    if(/\//.test(c.t)){
+      var parts=c.t.split(/\s*\/\s*/).map(function(x){return x.trim();}).filter(Boolean);
+      var hits=parts.map(function(x){return outByNorm[tocNorm(x)]||null;});
+      if(parts.length>1&&hits.filter(Boolean).length>=Math.ceil(parts.length/2)){remap[c.t]=hits.filter(Boolean)[0];dropped++;return;}
+    }
+    if(outByNorm[tocNorm(c.t)]){remap[c.t]=outByNorm[tocNorm(c.t)];dropped++;return;}
+    if(!hasEx(c.t)){dropped++;return;}
+    left.push({t:c.t,lv:3,__o:c.__o});
+  });
+  if(left.length&&!out.some(function(x){return x.t==='미분류 목차';}))out.push({t:'미분류 목차',lv:1});
+  return {list:out.concat(left),kept:kept,added:added,extra:left.length,dropped:dropped,remap:remap};
+}
+function tocBoxPasteDo(k){
+  var S=tocBoxState(k),t=document.getElementById('tocPaste_'+k);if(!t)return;
+  var pasted=tocParseRich(t.value);if(!pasted.length)return;
+  var bid=BEDIT;
+  var r=tocMerge(S.list,pasted,{hasEx:function(name){return bid!=null&&DATA.items.some(function(x){return String(x.bookId)===String(bid)&&x.chapter===name;});}});
+  var moved=0;
+  if(bid!=null&&r.remap)DATA.items.forEach(function(x){if(String(x.bookId)===String(bid)&&r.remap[x.chapter]){x.chapter=r.remap[x.chapter];moved++;}});
+  S.list=r.list;S.paste=false;tocBoxRender(k);
+  if(moved){setDirty();render();}
+  st('bkSt','목차 정리 · 새로 '+r.added+'개 · 순서 맞춤 '+r.kept+'개'+(r.dropped?' · 옛 항목 '+r.dropped+'개 정리':'')+(moved?' · 문장 '+moved+'개 옮김':'')+(r.extra?' · 문장 달린 '+r.extra+'개는 «미분류 목차»로':'')+' · «'+(BEDIT!=null?'고친 것 저장':'책 등록')+'»을 눌러야 반영됩니다','ok');
 }
 
 /* ---- 게시: 새 표지 사진을 covers/ 에 올린 뒤 excerpts.json 저장 ---- */
@@ -555,8 +807,8 @@ function impShow(d){
   IMP=[];
   d.reading.forEach(function(b){
     if(!b||!String(b.title||'').trim())return;
-    var g={b:{title:String(b.title).trim(),author:cleanAuthors(String(b.author||'').split('/')[0]),publisher:b.publisher||'',year:b.year||'',isbn:String(b.isbn||'').replace(/[^0-9Xx]/g,''),cover:/^https?:/.test(b.cover||'')?b.cover:''},ex:[]};
-    (b.excerpts||[]).forEach(function(e){var t=plain(e.text);if(t)g.ex.push({text:t,page:String(e.page||'').trim().replace(/^p\.?\s*/i,'')});});
+    var g={b:{title:String(b.title).trim(),author:cleanAuthors(String(b.author||'').split('/')[0]),publisher:b.publisher||'',year:b.year||'',isbn:String(b.isbn||'').replace(/[^0-9Xx]/g,''),cover:/^https?:/.test(b.cover||'')?b.cover:'',chapters:(b.chapters||[]).map(tocOne).filter(Boolean)},ex:[]};
+    (b.excerpts||[]).forEach(function(e){var t=plain(e.text);var ch=String(e.chapter||'').trim();if(t)g.ex.push({text:t,page:String(e.page||'').trim().replace(/^p\.?\s*/i,''),chapter:ch==='(미분류)'?'':ch});});
     IMP.push(g);
   });
   IMP.sort(function(a,b){return b.ex.length-a.ex.length||a.b.title.localeCompare(b.b.title,'ko');});
@@ -566,9 +818,9 @@ function impShow(d){
   $('impBox').innerHTML='<div class="row" style="margin-top:10px"><span class="st" style="margin:0">책 '+IMP.length+'권 · 발췌 '+nEx+'개 · 이미 있는 것은 흐리게</span>'
     +'<button class="btn" style="margin-left:auto" onclick="impAdd()">고른 것 추가</button></div>'
     +'<div class="imp">'+IMP.map(function(g,gi){
-      var bk=findBook(g.b.title,g.b.author);
-      return '<label class="g'+(bk?' dup':'')+'"><input type="checkbox" data-g="'+gi+'"'+(bk?' disabled':'')+' onchange="impGroup(this)"><div><div class="t">'+esc(g.b.title)+'</div><div class="s">'+esc([g.b.author,g.b.publisher,g.b.isbn?'ISBN '+g.b.isbn:'',g.ex.length?'발췌 '+g.ex.length:'발췌 없음',bk?'이미 등록된 책':''].filter(Boolean).join(' · '))+'</div></div></label>'
-        +g.ex.map(function(x,i){var dup=have[x.text];return '<label class="ex'+(dup?' dup':'')+'"><input type="checkbox" data-g="'+gi+'" data-i="'+i+'"'+(dup?' disabled':'')+'><div><div class="t">'+esc(x.text)+'</div>'+(x.page?'<div class="s">p.'+esc(x.page)+'</div>':'')+'</div></label>';}).join('');
+      var bk=findBook(g.b.title,g.b.author),tocOk=bk&&g.b.chapters.length&&!(bk.chapters&&bk.chapters.length);   /* 이미 있는 책도 목차가 비었으면 목차는 가져올 수 있게 */
+      return '<label class="g'+(bk&&!tocOk?' dup':'')+'"><input type="checkbox" data-g="'+gi+'"'+(bk&&!tocOk?' disabled':'')+' onchange="impGroup(this)"><div><div class="t">'+esc(g.b.title)+'</div><div class="s">'+esc([g.b.author,g.b.publisher,g.b.isbn?'ISBN '+g.b.isbn:'',g.b.chapters.length?'목차 '+g.b.chapters.length:'',g.ex.length?'발췌 '+g.ex.length:'발췌 없음',bk?(tocOk?'이미 등록된 책 · 체크하면 목차를 가져옵니다':'이미 등록된 책'):''].filter(Boolean).join(' · '))+'</div></div></label>'
+        +g.ex.map(function(x,i){var dup=have[x.text];return '<label class="ex'+(dup?' dup':'')+'"><input type="checkbox" data-g="'+gi+'" data-i="'+i+'"'+(dup?' disabled':'')+'><div><div class="t">'+esc(x.text)+'</div>'+(x.page||x.chapter?'<div class="s">'+esc([x.chapter,x.page?'p.'+x.page:''].filter(Boolean).join(' · '))+'</div>':'')+'</div></label>';}).join('');
     }).join('')+'</div>';
 }
 /* 책에 체크하면 그 책의 (아직 없는) 발췌도 함께 체크 · 다시 풀면 함께 풀림 */
@@ -577,18 +829,20 @@ function impGroup(cb){
   document.querySelectorAll('#impBox input[data-i][data-g="'+g+'"]').forEach(function(c){if(!c.disabled)c.checked=cb.checked;});
 }
 function impAdd(){
-  var nb=0,ne=0,fresh=[];
+  var nb=0,ne=0,ntoc=0,fresh=[];
   IMP.forEach(function(g,gi){
     var bookCb=document.querySelector('#impBox input[data-g="'+gi+'"]:not([data-i])');
     var exs=[].slice.call(document.querySelectorAll('#impBox input[data-i][data-g="'+gi+'"]:checked'));
     if(!(bookCb&&bookCb.checked)&&!exs.length)return;
     var b=findBook(g.b.title,g.b.author);
     if(!b){b=addBookObj(g.b);nb++;fresh.push(b);}
+    else if(g.b.chapters.length&&!(b.chapters&&b.chapters.length)){b.chapters=g.b.chapters.slice();ntoc++;}
     exs.forEach(function(c){var x=g.ex[+c.getAttribute('data-i')];if(!x)return;
-      DATA.items.push({id:nextId(),text:x.text,bookId:b.id,page:x.page,added:today()});ne++;});
+      var it={id:nextId(),text:x.text,bookId:b.id,page:x.page,added:today()};if(x.chapter)it.chapter=x.chapter;
+      DATA.items.push(it);ne++;});
   });
-  if(!nb&&!ne){alert('추가할 책이나 문장을 고르세요.');return;}
-  $('impBox').innerHTML='<div class="st ok">책 '+nb+'권 · 문장 '+ne+'개를 추가했습니다 · 위 «게시하기»를 눌러 저장하세요</div>';
+  if(!nb&&!ne&&!ntoc){alert('추가할 책이나 문장을 고르세요.');return;}
+  $('impBox').innerHTML='<div class="st ok">책 '+nb+'권 · 문장 '+ne+'개를 추가했습니다'+(ntoc?' · 목차 '+ntoc+'권':'')+' · 위 «게시하기»를 눌러 저장하세요</div>';
   setDirty();renderAll();
   /* HMD 에는 출판년도가 없으니, ISBN 이 있는 새 책은 조회해서 출판년도(와 빠진 표지·출판사)를 채운다 */
   var need=fresh.filter(function(b){return b.isbn&&(!b.year||!b.cover||!b.publisher);});
@@ -604,7 +858,7 @@ $('pvNew').innerHTML='<div class="pv"><div class="pv-h">데이지에서 보이�
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPc"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPh"></div></div></div></div></div>';pvSync('nText','');
 $('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');$('adm').value=ls('dz_adm');
-renderSelects();
+renderSelects();tocBoxInit('b',[]);
 load().then(function(){cmLoad();});
 </script>
 </body>

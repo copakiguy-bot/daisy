@@ -78,15 +78,36 @@
   .fl-ov.hl .fl-w.on{opacity:1!important;color:#fff;text-shadow:0 0 12px rgba(244,183,64,.5)}
   /* 질서를 갖춘 문장들: 아이폰 세로 너비 · 왼쪽 정렬 · 줄바꿈 무시 */
   .fl-col{position:absolute;top:66px;left:50%;transform:translateX(-50%);width:min(342px,calc(100vw - 48px))}
+  .fl-sent{cursor:pointer;border-radius:10px;margin-left:-10px!important;margin-right:-10px!important;padding:4px 10px;transition:background .3s}
+  @media (hover:hover){.fl-sent:hover{background:rgba(251,248,239,.05)}}
+  .fl-sent.sel{background:rgba(244,183,64,.1)}
+  /* 왼쪽: 이 책의 목차 · 모인 문장을 누르면 그 목차가 빛난다 */
+  .fl-toc{position:fixed;left:18px;top:56px;bottom:18px;width:244px;z-index:3;overflow-y:auto;overscroll-behavior:contain;padding:6px 6px 20px 2px;font-family:'Gowun Dodum',sans-serif;color:rgba(251,248,239,.62);scrollbar-width:thin;scrollbar-color:rgba(251,248,239,.18) transparent;animation:flTocIn .9s .3s ease both}
+  @keyframes flTocIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+  .fl-toc-h{font-family:'Noto Sans KR',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:rgba(251,248,239,.4);margin:0 0 8px 10px;min-height:16px}
+  .fl-toc-h em{font-style:normal;font-weight:400;letter-spacing:0;color:rgba(244,183,64,.85);margin-left:6px}
+  .fl-toc ol{list-style:none;margin:0;padding:0}
+  .fl-toc li{position:relative;padding:4px 8px 4px 10px;border-radius:7px;line-height:1.45;font-size:13px;transition:background .5s,color .5s}
+  .fl-toc li.lv1{font-size:13.5px;color:rgba(251,248,239,.82);margin-top:8px}
+  .fl-toc li.lv1:first-child{margin-top:0}
+  .fl-toc li.lv2{padding-left:22px}
+  .fl-toc li.lv3{padding-left:36px;font-size:12.5px;color:rgba(251,248,239,.5)}
+  .fl-toc li.has::after{content:'';position:absolute;left:3px;top:50%;width:3px;height:3px;margin-top:-1.5px;border-radius:50%;background:rgba(244,183,64,.55)}
+  .fl-toc li.lv2.has::after{left:15px}.fl-toc li.lv3.has::after{left:29px}
+  .fl-toc li.anc{color:rgba(251,248,239,.95)}
+  .fl-toc li.hit{background:rgba(244,183,64,.2);color:#fff;box-shadow:inset 3px 0 0 #f4b740;animation:flHit 1.6s ease}
+  @keyframes flHit{0%{background:rgba(244,183,64,.55)}100%{background:rgba(244,183,64,.2)}}
+  .fl-toc-tg{display:none;position:fixed;top:10px;left:12px;z-index:5;border:1px solid rgba(251,248,239,.25);background:rgba(14,40,35,.6);color:rgba(251,248,239,.85);font-family:'Gowun Dodum',sans-serif;font-size:13px;border-radius:999px;padding:5px 12px;cursor:pointer}
+  @media (max-width:899px){
+    .fl-toc{left:0;top:0;bottom:0;width:min(270px,80vw);padding:58px 10px 24px 8px;background:#0c241f;box-shadow:8px 0 30px rgba(0,0,0,.35);transform:translateX(-105%);transition:transform .4s cubic-bezier(.3,.7,.3,1);animation:none}
+    .fl-toc.open{transform:none}
+    .fl-toc-tg{display:block}
+  }
   .fl-sent{margin:0 0 30px}
   .fl-sent p{margin:0;font-family:'Gowun Dodum',sans-serif;font-size:16px;line-height:1.85;color:#fbf8ef;text-align:left;word-break:keep-all;overflow-wrap:break-word}
   .fl-sent .fw.pending{visibility:hidden}
   .fl-src{margin-top:6px;font-size:12px;color:rgba(251,248,239,.5);transition:opacity .8s}
   .fl-src.pending{opacity:0}
-  /* 어절에 커서를 대면 그 발췌문이 잠깐 */
-  .fl-pv{position:fixed;z-index:3;max-width:min(342px,calc(100vw - 32px));padding:12px 15px;border-radius:12px;background:rgba(251,248,239,.96);color:var(--dark);font-family:'Gowun Dodum',sans-serif;font-size:14px;line-height:1.75;text-align:left;word-break:keep-all;box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .25s ease,transform .25s ease}
-  .fl-pv.on{opacity:1;transform:none}
-  .fl-pv small{display:block;margin-top:4px;font-family:'Noto Sans KR',sans-serif;font-size:11.5px;color:var(--muted)}
   .fl-head{position:fixed;top:0;left:0;right:0;z-index:2;padding:16px 50px 22px;text-align:center;font-family:'Gowun Dodum',sans-serif;font-size:14px;color:rgba(251,248,239,.62);pointer-events:none;background:linear-gradient(rgba(14,40,35,.97) 55%,rgba(14,40,35,0))}
   .fl-x{position:fixed;top:10px;right:14px;z-index:4;border:none;background:none;color:rgba(251,248,239,.75);font-size:22px;cursor:pointer;padding:6px 8px;line-height:1}
   .fl-x:hover{color:#fff}
@@ -536,8 +557,8 @@ function floatOpen(){
   ov.innerHTML='<div class="fl-stage" id="flStage"><div class="fl-col" id="flCol"></div></div>'
     +'<div class="fl-head">〈'+esc(b.title||'')+'〉 · 문장 '+list.length+'</div>'
     +'<button type="button" class="fl-x" onclick="floatClose()" aria-label="닫기" title="닫기 (Esc)">✕</button>'
-    +'<div class="fl-hint">어절을 누르면 그 문장이 모입니다</div><div class="fl-pv" id="flPv"></div>';
-  var stage=ov.querySelector('#flStage'),col=ov.querySelector('#flCol'),pv=ov.querySelector('#flPv');
+    +'<div class="fl-hint">어절을 누르면 그 문장이 모입니다</div>'+flTocHTML(b,list);
+  var stage=ov.querySelector('#flStage'),col=ov.querySelector('#flCol'),toc=ov.querySelector('#flToc');
   /* 어절이 너무 많으면 문장마다 고르게 덜어 낸다 */
   var CAP=mob?360:720,wl=list.map(function(x){return flWords(x.text);});
   var total=wl.reduce(function(s,a){return s+a.length;},0),per=total>CAP?Math.max(4,Math.floor(CAP/list.length)):1e9;
@@ -555,20 +576,25 @@ function floatOpen(){
     });
   });
   stage.appendChild(frag);document.body.appendChild(ov);
-  FL={ov:ov,stage:stage,col:col,pv:pv,list:list,words:words,groups:groups,formed:{},busy:false,t0:performance.now(),last:performance.now(),hlOn:-1,box:box};
+  FL={ov:ov,stage:stage,col:col,toc:toc,list:list,words:words,groups:groups,formed:{},busy:false,t0:performance.now(),last:performance.now(),hlOn:-1,box:box};
   floatLayout();FL.Rx=FL.tRx;FL.Ry=FL.tRy;FL.cy=FL.tcy;
   if(matchMedia('(hover:hover)').matches){
-    ov.addEventListener('mouseover',function(e){var o=e.target.__o;if(o&&FL&&!FL.busy){flHl(o.ei);flPreview(o);}});
-    ov.addEventListener('mouseout',function(e){if(e.target.__o&&!(e.relatedTarget&&e.relatedTarget.__o)){flHl(-1);flPreview(null);}});
+    ov.addEventListener('mouseover',function(e){var o=e.target.__o;if(o&&FL&&!FL.busy)flHl(o.ei);});
+    ov.addEventListener('mouseout',function(e){if(e.target.__o&&!(e.relatedTarget&&e.relatedTarget.__o))flHl(-1);});
   }
-  ov.addEventListener('click',function(e){var o=e.target.__o;if(o&&!o.frozen)floatForm(o.ei);});
+  ov.addEventListener('click',function(e){
+    var o=e.target.__o;if(o&&!o.frozen){floatForm(o.ei);return;}
+    var sn=e.target.closest&&e.target.closest('.fl-sent');if(sn){flTocHit(+sn.getAttribute('data-ei'),sn);return;}
+    if(e.target.closest&&e.target.closest('#flTocTg')){flTocOpen();return;}
+    if(FL&&FL.toc&&FL.toc.classList.contains('open')&&!(e.target.closest&&e.target.closest('#flToc')))FL.toc.classList.remove('open');
+  });
   if(box)FL.boxAnim=box.animate([{opacity:1,transform:'none'},{opacity:0,transform:'scale(.97)'}],{duration:450,easing:'ease',fill:'forwards'});
   var still=reduceMotion();
   function step(now){
     if(!FL)return;
     var t=(now-FL.t0)/1000,dt=Math.min(.05,(now-FL.last)/1000),k=1-Math.exp(-dt*2.2);FL.last=now;
     FL.Rx+=(FL.tRx-FL.Rx)*k;FL.Ry+=(FL.tRy-FL.Ry)*k;FL.cy+=(FL.tcy-FL.cy)*k;              /* 문장이 쌓이면 구름은 천천히 그 밑으로 */
-    var cx=FL.stage.clientWidth/2,ws=FL.words;
+    var cx=flCx(),ws=FL.words;FL.col.style.left=cx+'px';
     for(var i=0;i<ws.length;i++){
       var o=ws[i];if(o.frozen)continue;
       var e=still?1:Math.min(1,Math.max(0,(t-o.d0)/1.3));e=1-Math.pow(1-e,3);
@@ -588,7 +614,8 @@ function floatLayout(){
   var W=FL.stage.clientWidth||innerWidth,H=innerHeight;
   var n=FL.words.filter(function(o){return !o.frozen;}).length;
   var R=34+15*Math.sqrt(Math.max(1,n));
-  var Rx=Math.min(W/2-24,R*(W>H?1.5:1)),Ry=Math.min(H*.34,R*(W>H?.92:1.2));
+  var half=(W-flInset())/2;
+  var Rx=Math.min(half-24,R*(W>H?1.5:1)),Ry=Math.min(H*.34,R*(W>H?.92:1.2));
   var colB=FL.col.children.length?FL.col.offsetTop+FL.col.offsetHeight:0;
   var cy=colB?colB+36+Ry:H/2+10;
   FL.tRx=Math.max(20,Rx);FL.tRy=Math.max(16,Ry);FL.tcy=cy;
@@ -600,16 +627,39 @@ function flHl(ei){
   FL.hlOn=ei;FL.ov.classList.toggle('hl',ei>=0);
   if(ei>=0)FL.groups[ei].forEach(function(o){if(!o.frozen)o.el.classList.add('on');});
 }
-function flPreview(o){
-  if(!FL)return;var pv=FL.pv;clearTimeout(pv.__t);
-  if(!o){pv.__t=setTimeout(function(){pv.classList.remove('on');},120);return;}
-  var it=FL.list[o.ei],pg=flPage(it);
-  pv.innerHTML=esc(flWords(it.text).join(' '))+(pg?'<small>'+esc(pg)+'</small>':'');
-  var r=o.el.getBoundingClientRect(),pw=pv.offsetWidth,ph=pv.offsetHeight;
-  var left=Math.max(12,Math.min(innerWidth-pw-12,r.left+r.width/2-pw/2));
-  var top=r.bottom+14+ph<innerHeight-10?r.bottom+14:Math.max(10,r.top-ph-14);
-  pv.style.left=left+'px';pv.style.top=top+'px';pv.classList.add('on');
+/* ---- 왼쪽 목차 ---- */
+function flTocList(b){return ((b&&b.chapters)||[]).map(function(c){var t=typeof c==='string'?c:(c&&c.t)||'';t=String(t).trim();var lv=+(c&&c.lv);return t?{t:t,lv:(lv===2||lv===3)?lv:1}:null;}).filter(Boolean);}
+function flTocHTML(b,list){
+  var L=flTocList(b);if(!L.length)return '';
+  var has={};list.forEach(function(x){if(x.chapter)has[x.chapter]=1;});
+  return '<button type="button" class="fl-toc-tg" id="flTocTg" aria-controls="flToc">☰ 목차</button>'
+    +'<aside class="fl-toc" id="flToc" aria-label="목차"><div class="fl-toc-h">목차<em id="flTocMsg"></em></div><ol>'
+    +L.map(function(c,i){return '<li class="lv'+c.lv+(has[c.t]?' has':'')+'" data-i="'+i+'">'+esc(c.t)+'</li>';}).join('')+'</ol></aside>';
 }
+function flTocWide(){return !!(FL&&FL.toc)&&innerWidth>=900;}
+function flTocOpen(force){if(!FL||!FL.toc)return;var o=force!=null?force:!FL.toc.classList.contains('open');FL.toc.classList.toggle('open',o);}
+/* 모인 문장을 누르면: 그 문장이 나온 목차(와 그 위 부·장)를 빛낸다 */
+function flTocHit(ei,sn){
+  var f=FL;if(!f)return;
+  f.col.querySelectorAll('.fl-sent.sel').forEach(function(e){e.classList.remove('sel');});
+  if(sn)sn.classList.add('sel');
+  var msg=document.getElementById('flTocMsg');
+  if(!f.toc){return;}
+  var it=f.list[ei],L=flTocList(bookOf(it)),lis=[].slice.call(f.toc.querySelectorAll('li'));
+  lis.forEach(function(li){li.classList.remove('hit','anc');});
+  var i=-1;if(it&&it.chapter)for(var k=0;k<L.length;k++)if(L[k].t===it.chapter){i=k;break;}
+  if(!innerWidth||innerWidth<900)flTocOpen(true);
+  clearTimeout(f.msgT);
+  if(i<0){if(msg){msg.textContent=it&&it.chapter?'«'+it.chapter+'» 은(는) 목차에 없습니다':'이 문장은 목차가 지정되지 않았습니다';f.msgT=setTimeout(function(){msg.textContent='';},2600);}return;}
+  if(msg)msg.textContent='';
+  var li=lis[i];void li.offsetWidth;li.classList.add('hit');
+  var lv=L[i].lv;for(var j=i-1;j>=0&&lv>1;j--){if(L[j].lv<lv){lis[j].classList.add('anc');lv=L[j].lv;}}
+  var tr=f.toc.getBoundingClientRect(),lr=li.getBoundingClientRect();
+  if(lr.top<tr.top+40||lr.bottom>tr.bottom-20)f.toc.scrollTo({top:f.toc.scrollTop+(lr.top-tr.top)-f.toc.clientHeight/3,behavior:'smooth'});
+}
+/* 구름·문장 기둥의 가운데: 넓은 화면에서 목차가 있으면 그 오른쪽 공간의 가운데 */
+function flInset(){return flTocWide()?280:0;}
+function flCx(){var W=FL.stage.clientWidth||innerWidth,ins=flInset();return ins+(W-ins)/2;}
 function floatKill(){if(!FL)return;cancelAnimationFrame(FL.raf);if(FL.ov)FL.ov.remove();FL=null;}
 function floatClose(){
   if(!FL||FL.closing)return;
@@ -620,9 +670,9 @@ function floatClose(){
 /* 어절 하나를 누르면: 그 문장의 어절들이 차례로 깨어나 위쪽의 제자리로 날아가 문장이 된다 */
 function floatForm(ei){
   var f=FL;if(!f||f.busy||f.closing||f.formed[ei])return;
-  f.busy=true;f.formed[ei]=true;flHl(-1);flPreview(null);
+  f.busy=true;f.formed[ei]=true;flHl(-1);
   var it=f.list[ei],ws=flWords(it.text),pg=flPage(it);
-  var sent=document.createElement('div');sent.className='fl-sent';
+  var sent=document.createElement('div');sent.className='fl-sent';sent.setAttribute('data-ei',ei);sent.title='눌러서 목차에서 찾기';
   sent.innerHTML='<p>'+ws.map(function(w,i){return '<span class="fw pending" data-i="'+i+'">'+esc(w)+'</span>';}).join(' ')+'</p>'
     +(pg?'<div class="fl-src pending">'+esc(pg)+'</div>':'');
   f.col.appendChild(sent);
