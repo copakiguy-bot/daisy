@@ -168,7 +168,7 @@
   <div class="card" id="bkCard">
     <h2>책 <span class="more" id="bkCnt"></span></h2>
     <div class="row">
-      <input id="bIsbn" class="in" inputmode="numeric" style="flex:1;min-width:180px" placeholder="ISBN (예: 9788934972464) · 넣고 엔터" onkeydown="if(event.key==='Enter'){event.preventDefault();bkLookup();}">
+      <input id="bIsbn" class="in" inputmode="numeric" style="flex:1;min-width:180px" placeholder="ISBN (예: 9788934972464) · 넣고 엔터" onkeydown="if(entKey(event)){event.preventDefault();bkLookup();}">
       <button class="btn ghost" onclick="bkLookup()">ISBN 조회</button>
       <button class="btn ghost" style="padding:8px 10px" title="카카오 책 검색 키 (한국 도서 정확 조회 · HMD 와 같은 키를 함께 씁니다)" onclick="setKakaoKey()">⚙</button>
       <button class="btn ghost" onclick="hmdLocal()" title="이 브라우저에 있는 HMD 독서 목록에서 고르기">HMD 책장에서 고르기</button>
@@ -234,6 +234,19 @@ var DATA={title:'데이지',books:[],items:[]}, SHA=null, DIRTY=false, EDIT=null
 var SUPA_URL='https://qjedpvzqpheggfyupkof.supabase.co', SUPA_KEY='sb_publishable_XzarJNgIdymB3HShYoPvnA_qe_ige_l';
 function sbH(extra){return Object.assign({apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json'},extra||{});}
 function $(id){return document.getElementById(id);}
+/* 엔터: 한글을 조합하는 중(마지막 글자가 아직 확정 전)에 누른 엔터는 바로 처리하지 않고,
+   글자가 확정된 뒤(compositionend) 한 번만 처리한다 — 안 그러면 «목차»를 넣은 뒤 남은 «목»이 한 줄 더 생긴다 */
+function entKey(e){
+  if(e.key!=='Enter')return false;
+  if(e.isComposing){
+    var el=e.target;e.preventDefault();el.__ent=true;
+    if(!el.__entB){el.__entB=1;el.addEventListener('compositionend',function(){
+      if(!el.__ent)return;el.__ent=false;
+      setTimeout(function(){if(document.body.contains(el))el.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true,cancelable:true}));},0);});}
+    return false;
+  }
+  return true;
+}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||'';if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return '';}}
 function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -550,7 +563,7 @@ function tocBoxRender(k){
   var head='<div class="toc-add">'
     +'<span class="toc-lv">'+[1,2,3].map(function(v){
       return '<button type="button" class="lunar-toggle'+(st.lv===v?' on':'')+'" data-lv="'+v+'" onclick="tocBoxLv(\''+k+'\','+v+')" title="'+TOC_LVN[v]+' 단으로 넣기">'+TOC_LVN[v]+'</button>';}).join('')+'</span>'
-    +'<input id="tocIn_'+k+'" placeholder="'+escA(tocBoxPh(st.lv))+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();tocBoxAdd(\''+k+'\');}">'
+    +'<input id="tocIn_'+k+'" placeholder="'+escA(tocBoxPh(st.lv))+'" onkeydown="if(entKey(event)){event.preventDefault();tocBoxAdd(\''+k+'\');}">'
     +'<button type="button" class="btn" onclick="tocBoxAdd(\''+k+'\')">추가</button>'
     +'<button type="button" class="btn ghost" onclick="tocBoxPasteTgl(\''+k+'\')" title="목차를 통째로 붙여넣기">📋 붙여넣기</button>'
     +'<button type="button" class="btn ghost toc-fullbtn" onclick="tocBoxFull(\''+k+'\')" title="목차만 크게 보기 (Esc 닫기)">'+(st.full?'✕ 닫기':'⤢ 크게')+'</button>'
