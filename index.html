@@ -89,7 +89,8 @@
   .fl-toc-h{font-family:'Noto Sans KR',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:rgba(251,248,239,.4);margin:0 0 8px 10px;min-height:16px}
   .fl-toc-h em{font-style:normal;font-weight:400;letter-spacing:0;color:rgba(244,183,64,.85);margin-left:6px}
   .fl-toc ol{list-style:none;margin:0;padding:0}
-  .fl-toc li{position:relative;padding:4px 8px 4px 10px;border-radius:7px;line-height:1.45;font-size:13px;transition:background .5s,color .5s}
+  .fl-toc li{position:relative;padding:4px 8px 4px 10px;border-radius:7px;line-height:1.45;font-size:13px;transition:background .5s,color .5s;cursor:pointer}
+  @media (hover:hover){.fl-toc li:hover{background:rgba(251,248,239,.06);color:rgba(251,248,239,.95)}}
   .fl-toc li.lv1{font-size:13.5px;color:rgba(251,248,239,.82);margin-top:8px}
   .fl-toc li.lv1:first-child{margin-top:0}
   .fl-toc li.lv2{padding-left:22px}
@@ -658,7 +659,8 @@ function floatOpen(){
     ov.addEventListener('mouseout',function(e){if(e.target.__o&&!(e.relatedTarget&&e.relatedTarget.__o))flHl(-1);});
   }
   ov.addEventListener('click',function(e){
-    var o=e.target.__o;if(o&&!o.frozen){floatForm(o.ei);return;}
+    var o=e.target.__o;if(o&&!o.frozen){flRequest([o.ei]);return;}
+    var tli=e.target.closest&&e.target.closest('#flToc li');if(tli){flTocPick(+tli.getAttribute('data-i'));return;}
     var sn=e.target.closest&&e.target.closest('.fl-sent');if(sn){flTocHit(+sn.getAttribute('data-ei'),sn);return;}
     if(e.target.closest&&e.target.closest('#flTocTg')){flTocOpen();return;}
     if(FL&&FL.toc&&FL.toc.classList.contains('open')&&!(e.target.closest&&e.target.closest('#flToc')))FL.toc.classList.remove('open');
@@ -735,6 +737,47 @@ function flTocHit(ei,sn){
 /* 구름·문장 기둥의 가운데: 넓은 화면에서 목차가 있으면 그 오른쪽 공간의 가운데 */
 function flInset(){return flTocWide()?280:0;}
 function flCx(){var W=FL.stage.clientWidth||innerWidth,ins=flInset();return ins+(W-ins)/2;}
+/* ---- 모을 문장 줄 세우기: 어절·목차를 눌러 고른 문장들을 하나씩 차례로 모은다 ---- */
+function flRequest(eis){
+  var f=FL;if(!f||f.closing)return 0;f.queue=f.queue||[];var n=0;
+  eis.forEach(function(ei){if(!f.formed[ei]&&f.queue.indexOf(ei)<0){f.queue.push(ei);n++;}});
+  flQueueRun();return n;
+}
+function flQueueRun(){
+  var f=FL;if(!f||f.busy||f.closing||!f.queue||!f.queue.length)return;
+  var ei=f.queue.shift();if(f.formed[ei])return flQueueRun();
+  floatForm(ei);
+}
+/* 목차를 누르면: 그 목차(와 그 아래 장·절)에 든 발췌문들을 쪽 순서대로 하나씩 모은다 */
+function flTocMark(i){
+  var f=FL;if(!f||!f.toc)return;
+  var L=flTocList(bookOf(f.list[0])),lis=[].slice.call(f.toc.querySelectorAll('li'));
+  lis.forEach(function(li){li.classList.remove('hit','anc');});
+  var li=lis[i];if(!li)return;void li.offsetWidth;li.classList.add('hit');
+  var lv=L[i].lv;for(var j=i-1;j>=0&&lv>1;j--){if(L[j].lv<lv){lis[j].classList.add('anc');lv=L[j].lv;}}
+}
+function flTocPick(i){
+  var f=FL;if(!f||f.closing)return;
+  var L=flTocList(bookOf(f.list[0]));if(!L[i])return;
+  var names={};names[L[i].t]=1;for(var j=i+1;j<L.length&&L[j].lv>L[i].lv;j++)names[L[j].t]=1;
+  var pn=function(x){var m=/\d+/.exec(String(x.page||''));return m?+m[0]:1e9;};
+  var eis=f.list.map(function(x,ei){return {x:x,ei:ei};}).filter(function(o){return o.x.chapter&&names[o.x.chapter];})
+    .sort(function(a,b){return pn(a.x)-pn(b.x)||a.ei-b.ei;}).map(function(o){return o.ei;});
+  flTocMark(i);
+  var msg=document.getElementById('flTocMsg');clearTimeout(f.msgT);
+  var left=eis.filter(function(ei){return !f.formed[ei];});
+  var t=!eis.length?'이 목차에는 문장이 없습니다':!left.length?'이미 모두 모였습니다':'문장 '+left.length+'개를 모읍니다';
+  if(msg){msg.textContent=t;f.msgT=setTimeout(function(){msg.textContent='';},2800);}
+  if(!left.length){                                                   /* 이미 모였으면 그 문장들로 데려간다 */
+    var first=eis.length&&f.col.querySelector('.fl-sent[data-ei="'+eis[0]+'"]');
+    if(first){f.col.querySelectorAll('.fl-sent.sel').forEach(function(e){e.classList.remove('sel');});
+      eis.forEach(function(ei){var sn=f.col.querySelector('.fl-sent[data-ei="'+ei+'"]');if(sn)sn.classList.add('sel');});
+      f.ov.scrollTo({top:Math.max(0,first.offsetTop+f.col.offsetTop-90),behavior:'smooth'});}
+    return;
+  }
+  if(innerWidth<900)setTimeout(function(){flTocOpen(false);},350);   /* 폰: 목차를 닫아 모이는 모습을 보여 준다 */
+  flRequest(left);
+}
 function floatKill(){if(!FL)return;cancelAnimationFrame(FL.raf);if(FL.ov)FL.ov.remove();FL=null;}
 function floatClose(){
   if(!FL||FL.closing)return;
@@ -780,6 +823,7 @@ function floatForm(ei){
     if(FL!==f)return;
     f.words=f.words.filter(function(o){return !o.frozen;});
     f.busy=false;
+    setTimeout(flQueueRun,140);                                          /* 줄 서 있는 다음 문장 */
   },maxEnd+80);
 }
 function closeExcerpt(){if(FL)floatKill();exBusy=false;CUR=null;if(exTimer){clearInterval(exTimer);exTimer=null;}var e=document.getElementById('exOv');if(e)e.remove();document.removeEventListener('keydown',exEsc);}
