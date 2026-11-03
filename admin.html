@@ -56,6 +56,14 @@
   .pv{margin-top:12px;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;background:#fcfbf8}
   .pv-h{font-size:12.5px;font-weight:800;color:var(--dark);margin-bottom:10px}
   .pv-h span{font-weight:400;color:var(--muted)}
+  .pv-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  /* 자간: Shift+Ctrl+N 줄이기 · Shift+Ctrl+M 늘리기 */
+  .ls-ctl{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--dark)}
+  .ls-ctl b{min-width:38px;text-align:center;font-variant-numeric:tabular-nums;color:var(--green)}
+  .ls-ctl b.z{color:var(--muted);font-weight:400}
+  .ls-ctl button{border:1px solid var(--line);background:#fff;border-radius:6px;width:24px;height:22px;padding:0;font-family:inherit;font-size:13px;line-height:1;cursor:pointer;color:var(--dark)}
+  .ls-ctl button.r{width:auto;padding:0 6px;font-size:11px;font-weight:400;color:var(--muted)}
+  .ls-ctl button:hover{border-color:var(--yellow)}
   .pv-row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
   .pv-l{font-size:11.5px;color:var(--muted);margin-bottom:5px;text-align:center}
   .pvq{font-family:'Gowun Dodum',sans-serif;line-height:1.85;color:var(--dark);text-align:center;word-break:keep-all;overflow-wrap:break-word;white-space:pre-line;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(18,49,43,.06)}
@@ -331,10 +339,32 @@ function chSelFill(selId,bid,sel){var el=$(selId);if(!el)return;var h=chOptions(
 
 /* ---- 줄바꿈 미리보기: 데이지 카드와 같은 글꼴 · 글자 크기 · 줄 너비 ----
    컴퓨터 = 카드 안쪽 556px · 20px / 아이폰(390px 화면) = 306px · 16px */
+/* ---- 자간: 데이지 카드의 문장에도 그대로 적용된다 (−15% ~ +10%, 1%씩) ---- */
+var LS_MIN=-0.15,LS_MAX=0.1;
+function lsGet(ta){var v=parseFloat(ta&&ta.dataset.ls);return isFinite(v)?v:0;}
+function lsLabel(v){var p=Math.round(v*100);return p?(p>0?'+':'−')+Math.abs(p)+'%':'0%';}
+function lsSet(taId,v){var ta=$(taId);if(!ta)return;v=Math.round(Math.max(LS_MIN,Math.min(LS_MAX,v))*100)/100;ta.dataset.ls=String(v);pvSync(taId,taId==='eText'?'E':'');}
+function lsStep(taId,d){var ta=$(taId);if(!ta)return;lsSet(taId,d===0?0:lsGet(ta)+d*0.01);}
+function lsCtlHTML(taId,suf){
+  return '<span class="ls-ctl" title="자간 · Shift+Ctrl+N 줄이기 · Shift+Ctrl+M 늘리기">자간 <b id="lsInd'+suf+'" class="z">0%</b>'
+    +'<button type="button" onclick="lsStep(\''+taId+'\',-1)" aria-label="자간 줄이기 (Shift+Ctrl+N)">−</button>'
+    +'<button type="button" onclick="lsStep(\''+taId+'\',1)" aria-label="자간 늘리기 (Shift+Ctrl+M)">+</button>'
+    +'<button type="button" class="r" onclick="lsStep(\''+taId+'\',0)" title="자간 원래대로">원래대로</button></span>';
+}
+/* 단축키: 문장 칸에서 Shift+Ctrl+N = 줄이기 · Shift+Ctrl+M = 늘리기 (한글 입력 중에도 자판 위치로 알아본다) */
+document.addEventListener('keydown',function(e){
+  var t=e.target;if(!t||!t.classList||!t.classList.contains('qed'))return;
+  if(!e.ctrlKey||!e.shiftKey||e.altKey||e.metaKey)return;
+  var c=e.code||'',k=String(e.key||'').toLowerCase();
+  var d=(c==='KeyN'||k==='n'||k==='ㅜ')?-1:(c==='KeyM'||k==='m'||k==='ㅡ')?1:0;
+  if(!d)return;e.preventDefault();lsStep(t.id,d);
+},true);
 function pvSync(taId,suf){
   var ta=$(taId);if(!ta)return;
   ta.style.height='auto';ta.style.height=(ta.scrollHeight+2)+'px';      /* 스크롤바가 줄 너비를 줄이지 않게 키워 준다 */
-  var v=ta.value,pc=$('pvPc'+suf),ph=$('pvPh'+suf);
+  var v=ta.value,pc=$('pvPc'+suf),ph=$('pvPh'+suf),lsv=lsGet(ta),lsc=lsv?lsv+'em':'';
+  ta.style.letterSpacing=lsc;[pc,ph].forEach(function(e){if(e)e.style.letterSpacing=v?lsc:'';});
+  var ind=$('lsInd'+suf);if(ind){ind.textContent=lsLabel(lsv);ind.classList.toggle('z',!lsv);}
   if(pc)pc.textContent=v||'문장을 쓰면 여기에 보입니다';
   if(ph)ph.textContent=v||'문장을 쓰면 여기에 보입니다';
   [pc,ph].forEach(function(e){if(e)e.classList.toggle('ph',!v);});
@@ -368,8 +398,8 @@ function render(){
   if(!list.length){$('list').innerHTML='<div class="empty">'+(q||fb?'찾는 문장이 없습니다.':'아직 문장이 없습니다. 위에서 추가하세요.')+'</div>';paintBar();return;}
   $('list').innerHTML=list.map(function(x){
     if(EDIT===x.id)return '<div class="it edit"><div class="q">'
-      +'<textarea class="in qed" id="eText" oninput="pvSync(\'eText\',\'E\')">'+esc(x.text)+'</textarea>'
-      +'<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span></div>'
+      +'<textarea class="in qed" id="eText" data-ls="'+(Number(x.ls)||0)+'" oninput="pvSync(\'eText\',\'E\')">'+esc(x.text)+'</textarea>'
+      +'<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span>'+lsCtlHTML('eText','E')+'</div>'
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPcE"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPhE"></div></div></div></div></div>'
       +'<div class="row" style="margin-top:6px"><select id="eBook" class="in" style="flex:1;min-width:160px" onchange="bkSelChange(this)">'+bookOptions(x.bookId,true)+'</select>'
@@ -377,7 +407,7 @@ function render(){
       +'<input id="ePage" class="in" style="width:80px" value="'+esc(x.page||'')+'" placeholder="쪽">'
       +'<button class="btn" onclick="editSave('+x.id+')">확인</button><button class="btn ghost" onclick="EDIT=null;render()">취소</button></div></div></div>';
     var nc=CMS.filter(function(c){return c.excerpt_id===String(x.id)&&!c.hidden;}).length;
-    return '<div class="it"><div class="q"><div class="tx">'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x)||'(책 없음)')+(nc?' · <a href="#cmCard" style="color:var(--green)">의견 '+nc+'</a>':'')+'</div></div>'
+    return '<div class="it"><div class="q"><div class="tx"'+(Number(x.ls)?' style="letter-spacing:'+Number(x.ls)+'em"':'')+'>'+esc(x.text)+'</div><div class="src">'+esc(srcStr(x)||'(책 없음)')+(nc?' · <a href="#cmCard" style="color:var(--green)">의견 '+nc+'</a>':'')+'</div></div>'
       +'<div class="act"><button onclick="EDIT='+x.id+';render()">고치기</button><button class="del" onclick="delItem('+x.id+')">지우기</button></div></div>';
   }).join('');
   paintBar();
@@ -391,13 +421,15 @@ function addItem(){
   var it={id:nextId(),text:t,page:$('nPage').value.trim().replace(/^p\.?\s*/i,''),added:today()};
   if(bid)it.bookId=Number(bid)||bid;
   var ch=$('nCh').style.display==='none'?'':$('nCh').value;if(ch)it.chapter=ch;
+  var lsv=lsGet($('nText'));if(lsv)it.ls=lsv;
   DATA.items.push(it);ls('dz_lastbook',bid);
-  $('nText').value='';$('nPage').value='';pvSync('nText','');setDirty();renderBooks();render();$('nText').focus();
+  $('nText').dataset.ls='0';$('nText').value='';$('nPage').value='';pvSync('nText','');setDirty();renderBooks();render();$('nText').focus();
 }
 function editSave(id){
   var x=DATA.items.find(function(a){return a.id===id;});if(!x)return;
   var t=$('eText').value.trim();if(!t){alert('문장이 비었습니다.');return;}
-  x.text=t;var bid=$('eBook').value;if(bid&&bid!=='__new')x.bookId=Number(bid)||bid;else delete x.bookId;
+  x.text=t;var lsv=lsGet($('eText'));if(lsv)x.ls=lsv;else delete x.ls;
+  var bid=$('eBook').value;if(bid&&bid!=='__new')x.bookId=Number(bid)||bid;else delete x.bookId;
   x.page=$('ePage').value.trim().replace(/^p\.?\s*/i,'');
   var ch=$('eCh')&&$('eCh').style.display!=='none'?$('eCh').value:'';if(ch)x.chapter=ch;else delete x.chapter;
   EDIT=null;setDirty();renderBooks();render();
@@ -867,7 +899,7 @@ function impAdd(){
   });},i*350);});
 }
 
-$('pvNew').innerHTML='<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span></div>'
+$('pvNew').innerHTML='<div class="pv"><div class="pv-h">데이지에서 보이는 줄바꿈 <span>(엔터로 원하는 곳에서 줄을 바꾸세요)</span>'+lsCtlHTML('nText','')+'</div>'
       +'<div class="pv-row"><div class="pv-col"><div class="pv-l">컴퓨터</div><div class="pvq pv-pc" id="pvPc"></div></div>'
       +'<div class="pv-col"><div class="pv-l">아이폰</div><div class="pv-phone"><div class="pvq pv-ph" id="pvPh"></div></div></div></div></div>';pvSync('nText','');
 $('repo').value=ls('dz_repo')||guessRepo();$('tok').value=ls('dz_tok');$('adm').value=ls('dz_adm');
